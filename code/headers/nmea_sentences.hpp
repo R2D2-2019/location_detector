@@ -4,7 +4,7 @@
 
 #pragma once
 
-
+/// @brief nmea_sentences
 enum class nmea_sentence_c {
     GPRMC,
     GPGGA, 
@@ -31,8 +31,3 @@ const nmea_sentence_info_type_s & nmea_info(nmea_sentence_c nmea){
     return nmea_info_array[n];
 }
 
-enum class GPRMC  {
-
-
-
-};
