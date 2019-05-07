@@ -1,8 +1,9 @@
+#include "hwlib.hpp"
+
 struct geographic_coordinate_s {
-    signed int latitude;
-    char NS;
-    signed int longtitude;
-    char EW;
+    uint32_t latitude;
+    unint32_t longtitude;
+    uint8_t NESW;
     int altitude;
 };
 
