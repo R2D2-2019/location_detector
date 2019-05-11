@@ -1,17 +1,19 @@
+#pragma once
+
 #include "hwlib.hpp"
+#include <base_module.hpp>
 
-struct geographic_coordinate_s {
-    uint32_t latitude;
-    uint32_t longtitude;
-    uint8_t north_east;
-    int16_t altitude;
-};
+namespace r2d2::location_detector {
 
-class location_detection_c {
-public:
-    virtual void process() = 0;
+    class location_detection_c {
+    public:
+        void process();
 
-protected:
-    virtual geographic_coordinate_s get_location() = 0;
-    geographic_coordinate_s compress_coordinate();
-};
+    protected:
+        virtual frame_coordinate_s get_location();
+        GGA parse_nmea(hwlib::string);
+        frame_coordinate_s compress(GGA);
+        frame_coordinate_s compress(uint32_t longitude, uint32_t latitude, bool north, bool east, int16_t altitude);
+    };
+
+} // namespace r2d2::location_detector
