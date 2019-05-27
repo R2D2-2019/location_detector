@@ -2,10 +2,9 @@
 
 #include <hwlib.hpp>
 
-namespace r2d2::location_detector{
+namespace r2d2::location_detector {
 
-    struct gga_s
-    {
+    struct gga_s {
         uint32_t time;
         float latitude;
         char noth_south_hemisphere;
@@ -19,6 +18,5 @@ namespace r2d2::location_detector{
         float geoid_height;
         char geoid_height_measurement;
     };
-    
 
 } // namespace r2d2::location_detector
