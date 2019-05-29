@@ -24,9 +24,46 @@ namespace r2d2::location_detector {
         gga_s last_result; // last result, because we may want to optimize this
                            // by only updating the location after a certain
                            // amount of time.
-
+        /// \brief
+        /// 
+        /// \details
+        ///
         frame_coordinate_s compress(const gga_s &source);
-        gga_s parse_nmea(hwlib::string<0> nmea_sentence);
+        /// \brief
+        /// returns time as an integer
+        /// \details
+        /// This function return time as an integer by converting it from a hwlib::string
+        uint32_t time_maker(const hwlib::string<10> &time);
+        /// \brief
+        /// returns either a longitude or latitude as a float
+        /// \details
+        /// converts a hwlib::string to a calculatable float, useable as a coordinate
+        float latitude_longitude_maker(const hwlib::string<15> &coordinate);
+        /// \brief
+        /// returns quality of fix
+        /// \details
+        /// converts a hwlib::string to an integer
+        uint8_t fix_maker(const hwlib::string<10> &fix);
+        /// \brief
+        /// returns the number of satellites tracked
+        /// \details
+        /// converts a hwlib::string to an integer
+        uint8_t satellite_maker(const hwlib::string<10> &satellites);
+        /// \brief
+        /// returns the horizontal dilution
+        /// \details
+        /// returns a float after converting a hwlib::string
+        float horizontal_dilution_maker(const hwlib::string<10> &dilution);
+        /// \brief
+        /// returns the altitude or geoid
+        /// \details
+        /// converts a hwlib::string to a float
+        float altitude_geoid_maker(const hwlib::string<10> &altitude);
+        /// \brief
+        /// returns a location struct filled with corresponding information/datatypes
+        /// \details
+        /// chops up a hwlib::string and calls other 'maker' functions to fill struct.
+        gga_s parse_nmea(const hwlib::string<0> &gps_message);
 
     protected:
         frame_coordinate_s get_location() override;
