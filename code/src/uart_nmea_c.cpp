@@ -53,7 +53,7 @@ namespace r2d2::location_detector {
                         // and ',' at the end, has a length of 7 characters. If
                         // the ID is longer, it cannot be the ID we are looking
                         // for.
-                    } else if (gga_sentence.length() == 7) {
+                    } else if (gga_sentence.length() > 7) {
                         gga_sentence.clear();
                         state = clear_buffer;
                     }
