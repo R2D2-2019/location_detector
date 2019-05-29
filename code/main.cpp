@@ -1,20 +1,5 @@
 #include "hwlib.hpp"
-#include <hardware_usart.hpp>
 
-struct gga_s{
-  uint32_t  time;                         // 1 current time when location was sent
-  float     latitude;                     // 2 east to west
-  char      north_south_hemisphere;       // 3 'N' will be north and 'S' will be south
-  float     longitude;                    // 4 north to south
-  char      east_west_hemisphere;         // 5 'E' will be east and 'E' will be west
-  uint8_t   fix_quality;                  // 6 Satellite 'fix' w/e that is...
-  uint8_t   satellites_tracked;           // 7 Number of satellites tracked
-  float     horizontal_dilution;          // 8 Not even a clue what this means at the moment
-  float     altitude;                     // 9 height relative to oceanic water surface
-  char      altitude_measurement;
-  float     geoid_height;                 // 10 height of geoid
-  char      geoid_height_measurement;     
-};
 uint32_t time_maker(const hwlib::string<10> &time){
   char temp_char;
   uint32_t temp_time = 0;
@@ -217,10 +202,6 @@ int main(void) {
     WDT->WDT_MR = WDT_MR_WDDIS;
     hwlib::wait_ms(1000);
     const hwlib::string <100> gps_message = "$GPGGA,123519,4807.038,N,01131.000,E,5,14,0.9,545.4,M,46.9,M,,*47"; //GSS Formatted message from module to test function
-
-    //hwlib::cout << c_string << hwlib::endl;
-
-    
 
     for (unsigned int i = 0; i < 1; i++){
         hwlib::wait_ms(1000);

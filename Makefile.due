@@ -21,4 +21,3 @@ include              $(USART)/Makefile.inc
 
 # defer to the Makefile.link
 include           $(RELATIVE)/Makefile.link
-
