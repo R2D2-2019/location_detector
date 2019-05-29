@@ -2,16 +2,21 @@
 
 namespace r2d2::location_detector {
 
-    frame_coordinate_s module_c::compress(float longitude, float latitude,
-                                          bool north, bool east,
-                                          int16_t altitude) {
-        frame_coordinate_s compressed_frame;
+    frame_coordinate_s module_c::compress(float longitude, float latitude, bool north, bool east, int16_t altitude) {
 
-        compressed_frame.altitude = altitude;
-        compressed_frame.north_south_hemisphere = north;
-        compressed_frame.east_west_hemisphere = east;
+        uint8_t longitude_degrees = longitude;
+        uint8_t longitude_minutes = (longitude - longitude_degrees) * 60;
+        uint8_t longitude_seconds = ((longitude - longitude_degrees) * 60 - longitude_minutes) * 60;
+        uint8_t longitude_thousandths_second = (((( longitude - longitude_degrees) * 60 - longitude_minutes) * 60) - longitude_seconds) * 1000;
 
-        compressed_frame.
+        uint8_t latitude_degrees = latitude;
+        uint8_t latitude_minutes = (latitude - latitude_degrees) * 60;
+        uint8_t latitude_seconds = ((latitude - latitude_degrees) * 60 - latitude_minutes) * 60;
+        uint8_t latitude_thousandths_second = (((( latitude - latitude_degrees) * 60 - latitude_minutes) * 60) - latitude_seconds) * 1000;
+
+        return frame_coordinate_s {latitude_degrees, latitude_minutes, latitude_seconds, latitude_thousandths_second, longitude_degrees, longitude_minutes, longitude_seconds,
+                                    longitude_thousandths_second, north, east, altitude};
+
     }
 
     void module_c::process() {
