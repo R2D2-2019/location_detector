@@ -19,7 +19,8 @@ namespace r2d2::location_detector {
     /// NMEA gga messages.
     class uart_nmea_c {
     private:
-        hwlib::string<100> gga_sentence = {};
+        std::array<uint8_t, 100> gga_sentence = {};
+        size_t gga_index = 0;
         r2d2::usart::usart_connection_c &usart;
         gga_s last_result; // last result, because we may want to optimize this
                            // by only updating the location after a certain
@@ -33,38 +34,38 @@ namespace r2d2::location_detector {
         /// \details
         /// This function return time as an integer by converting it from a
         /// hwlib::string
-        uint32_t time_maker(const hwlib::string<10> &time);
+        uint32_t time_maker(const uint8_t *time, const size_t length);
         /// \brief
         /// returns either a longitude or latitude as a float
         /// \details
         /// converts a hwlib::string to a calculatable float, useable as a
         /// coordinate
-        float latitude_longitude_maker(const hwlib::string<15> &coordinate);
+        float latitude_longitude_maker(const uint8_t *coordinate, const size_t length);
         /// \brief
         /// returns quality of fix
         /// \details
         /// converts a hwlib::string to an integer
-        uint8_t fix_maker(const hwlib::string<10> &fix);
+        uint8_t fix_maker(const uint8_t *fix, const size_t length);
         /// \brief
         /// returns the number of satellites tracked
         /// \details
         /// converts a hwlib::string to an integer
-        uint8_t satellite_maker(const hwlib::string<10> &satellites);
+        uint8_t satellite_maker(const uint8_t *satellites, const size_t length);
         /// \brief
         /// returns the horizontal dilution
         /// \details
         /// returns a float after converting a hwlib::string
-        float horizontal_dilution_maker(const hwlib::string<10> &dilution);
+        float horizontal_dilution_maker(const uint8_t *dilution, const size_t length);
         /// \brief
         /// returns the altitude or geoid
         /// \details
         /// converts a hwlib::string to a float
-        float altitude_geoid_maker(const hwlib::string<10> &altitude);
+        float altitude_geoid_maker(const uint8_t *altitude, const size_t length);
         /// \brief
         /// returns a location struct filled with corresponding
         /// information/datatypes \details chops up a hwlib::string and calls
         /// other 'maker' functions to fill struct.
-        gga_s parse_nmea(const hwlib::string<0> &gps_message);
+        gga_s parse_nmea(const uint8_t *gps_message, const size_t length);
         /**
          * \brief This method is used to manually make coordinate frames.
          *
@@ -91,7 +92,7 @@ namespace r2d2::location_detector {
         /// GNSS module.
         uart_nmea_c(r2d2::usart::usart_connection_c &usart_port);
 
-        
+
     };
 
 } // namespace r2d2::location_detector

@@ -20,6 +20,7 @@ namespace r2d2::location_detector {
             check_message_id,
             get_sentence
         };
+
         get_location_state state = clear_buffer;
         char uart_input = 0;
 
@@ -36,7 +37,7 @@ namespace r2d2::location_detector {
             // wait for a $ sign
             case wait_for_start:
                 if (usart.getc() == '$') {
-                    gga_sentence.append('$');
+                    gga_sentence[gga_index++] = '$';
                     state = get_message_id;
                 }
                 break;
@@ -44,8 +45,8 @@ namespace r2d2::location_detector {
             // get the message ID
             case get_message_id:
                 if (usart.char_available()) {
-                    gga_sentence.append(usart.getc());
-                    if (gga_sentence[gga_sentence.length() - 1] == ',') {
+                    gga_sentence[gga_index++] = usart.getc();
+                    if (gga_sentence[gga_index - 1] == ',') {
                         // a comma indicates the end of the message id
                         state = check_message_id;
 
@@ -53,8 +54,8 @@ namespace r2d2::location_detector {
                         // and ',' at the end, has a length of 7 characters. If
                         // the ID is longer, it cannot be the ID we are looking
                         // for.
-                    } else if (gga_sentence.length() > 7) {
-                        gga_sentence.clear();
+                    } else if (gga_index > 7) {
+                        gga_index = 0;
                         state = clear_buffer;
                     }
                 }
@@ -62,11 +63,11 @@ namespace r2d2::location_detector {
 
             // check if the message ID is equal to GGA
             case check_message_id:
-                if (gga_sentence.find_at("GGA", 2)) {
+                if (gga_sentence[2] == 'G' && gga_sentence[3] == 'G' && gga_sentence[4] == 'A') {
                     // if GGA, then send the characters to a string
                     state = get_sentence;
                 } else { // if not GGA, clear the string and wait for a $ sign
-                    gga_sentence.clear();
+                    gga_index = 0;
                     state = clear_buffer;
                 }
                 break;
@@ -78,22 +79,22 @@ namespace r2d2::location_detector {
                     // if a $ is encountered, clear the string and get the
                     // message ID.
                     if (uart_input == '$') {
-                        gga_sentence.clear();
-                        gga_sentence.append('$');
+                        gga_index = 0;
+                        gga_sentence[gga_index++] =('$');
                         state = get_message_id;
 
                         // if the character is a carriage return (ascii code
                         // 13), safe the string and parse it.
                     } else if (uart_input == 13) {
-                        last_result = parse_nmea(gga_sentence);
+                        last_result = parse_nmea(gga_sentence.begin(), gga_index);
                         return compress(last_result);
                     } else {
-                        gga_sentence.append(uart_input);
+                        gga_sentence[gga_index++] =(uart_input);
 
                         // if the maximum number of characters has been reached,
                         // clear the string and wait for a $ sign
-                        if (gga_sentence.length() >= 100) {
-                            gga_sentence.clear();
+                        if (gga_index >= 100) {
+                            gga_index = 0;
                             state = wait_for_start;
                         }
                     }
@@ -106,29 +107,29 @@ namespace r2d2::location_detector {
         }
     }
 
-    uint32_t uart_nmea_c::time_maker(const hwlib::string<10> &time) {
+    uint32_t uart_nmea_c::time_maker(const uint8_t *time, const size_t length) {
         char temp_char;
         uint32_t temp_time = 0;
-        for (unsigned int i = 0; i < time.length(); i++) {
+        for (unsigned int i = 0; i < length; i++) {
             temp_char = time[i];
             temp_char -= '0';
             temp_time += temp_char;
-            if (i + 1 < time.length()) {
+            if (i + 1 < length) {
                 temp_time *= 10;
             }
         }
         return temp_time;
     }
-    float
-    uart_nmea_c::latitude_longitude_maker(const hwlib::string<15> &coordinate) {
+
+    float uart_nmea_c::latitude_longitude_maker(const uint8_t *coordinate, const size_t length) {
         char temp_char;
         uint32_t temp_coord = 0;
-        for (unsigned int i = 0; i < coordinate.length(); i++) {
+        for (unsigned int i = 0; i < length; i++) {
             if (coordinate[i] != '.') {
                 temp_char = coordinate[i];
                 temp_char -= '0';
                 temp_coord += temp_char;
-                if (i + 1 < coordinate.length()) {
+                if (i + 1 < length) {
                     temp_coord *= 10;
                 }
             }
@@ -136,10 +137,10 @@ namespace r2d2::location_detector {
         return temp_coord / 1000;
     }
 
-    uint8_t uart_nmea_c::fix_maker(const hwlib::string<10> &fix) {
+    uint8_t uart_nmea_c::fix_maker(const uint8_t *fix, const size_t length) {
         char temp_char;
         uint8_t fix_int = 0;
-        for (unsigned int i = 0; i < fix.length(); i++) {
+        for (unsigned int i = 0; i < length; i++) {
             if (fix[0] == '0') {
                 return 0;
             } else if (fix[i] > int('0')) {
@@ -154,15 +155,15 @@ namespace r2d2::location_detector {
         return fix_int;
     }
 
-    uint8_t uart_nmea_c::satellite_maker(const hwlib::string<10> &satellites) {
+    uint8_t uart_nmea_c::satellite_maker(const uint8_t *satellites, const size_t length) {
         char temp_char;
         uint8_t number_of_satellites = 0;
-        for (unsigned int i = 0; i < satellites.length(); i++) {
+        for (unsigned int i = 0; i < length; i++) {
             temp_char = satellites[i];
             temp_char -= '0';
             if (i == 0) {
                 number_of_satellites = temp_char;
-                if (satellites.length() > 1) {
+                if (length > 1) {
                     number_of_satellites *= 10;
                 }
             } else if (i == 1) {
@@ -175,15 +176,15 @@ namespace r2d2::location_detector {
     }
 
     float
-    uart_nmea_c::horizontal_dilution_maker(const hwlib::string<10> &dilution) {
+    uart_nmea_c::horizontal_dilution_maker(const uint8_t *dilution, const size_t length) {
         char temp_char;
         float temp_dilution = 0.0;
-        for (unsigned int i = 0; i < dilution.length(); i++) {
-            if (dilution != '.') {
+        for (unsigned int i = 0; i < length; i++) {
+            if (dilution[i] != '.') {
                 temp_char = dilution[i];
                 temp_char -= '0';
                 temp_dilution = temp_char;
-                if (i + 1 < dilution.length()) {
+                if (i + 1 < length) {
                     temp_dilution *= 10;
                 }
             }
@@ -191,10 +192,10 @@ namespace r2d2::location_detector {
         return temp_dilution / 10;
     }
 
-    float uart_nmea_c::altitude_geoid_maker(const hwlib::string<10> &altitude) {
+    float uart_nmea_c::altitude_geoid_maker(const uint8_t *altitude, const size_t length) {
         char temp_char;
         float temp_altitude = 0.0;
-        for (unsigned int i = 0; i < altitude.length(); i++) {
+        for (unsigned int i = 0; i < length; i++) {
             if (altitude[0] == '0') {
                 return 0.0;
             }
@@ -202,7 +203,7 @@ namespace r2d2::location_detector {
                 temp_char = altitude[i];
                 temp_char -= '0';
                 temp_altitude += temp_char;
-                if (i + 1 < altitude.length()) {
+                if (i + 1 < length) {
                     temp_altitude *= 10;
                 }
             }
@@ -213,27 +214,14 @@ namespace r2d2::location_detector {
     size_t get_offset_separator(const uint8_t *gps_message, const size_t length, const uint8_t separator){
         for(size_t i = 0; i < length; i++){
             if (gps_message[i] == separator){
-                return i;
+                return i + 1;
             }
         }
         return 0;
     }
 
     gga_s uart_nmea_c::parse_nmea(const uint8_t *gps_message, const size_t length) {
-        // uint8_t comma_counter = 0;
-        // hwlib::string<10> time;
-        // hwlib::string<10> latitude;
-        // char north_south_hemisphere;
-        // hwlib::string<10> longitude;
-        // char east_west_hemisphere;
-        // hwlib::string<10> fix_quality;
-        // hwlib::string<10> satellites_tracked;
-        // hwlib::string<10> horizontal_dilution;
-        // hwlib::string<10> altitude;
-        // char altitude_measurement;
-        // hwlib::string<10> geoid_height;
-        // char geoid_height_measurement;
-        enum GGA : uint8_t {
+        enum class GGA : uint8_t {
             time,
             latitude,
             north_south_hemisphere,
@@ -248,77 +236,68 @@ namespace r2d2::location_detector {
             geoid_height_measurement
         };
 
-        GGA GGAindex = time;
+        gga_s location;
+        GGA GGAindex = GGA::time;
         for (size_t i = 0; i < length; i++){
-            size_t offset = get_offset_separator(gps_message + i, length, ',');
+            size_t sep_offset = get_offset_separator(gps_message + i, length - i, ',');
 
             switch (GGAindex){
-                
+                case GGA::time: {
+                    location.time = time_maker(gps_message + i, sep_offset);
+                    break;
+                }
+                case GGA::latitude: {
+                    location.latitude = latitude_longitude_maker(gps_message + i, sep_offset);
+                    break;
+                }
+                case GGA::north_south_hemisphere: {
+                    location.north_south_hemisphere = gps_message[i];
+                    break;
+                }
+                case GGA::longitude: {
+                    location.longitude = latitude_longitude_maker(gps_message + i, sep_offset);
+                    break;
+                }
+                case GGA::east_west_hemisphere: {
+                    location.east_west_hemisphere = gps_message[i];
+                    break;
+                }
+                case GGA::fix_quality: {
+                    location.fix_quality = fix_maker(gps_message + i, sep_offset);
+                    break;
+                }
+                case GGA::satellites_tracked: {
+                    location.satellites_tracked = satellite_maker(gps_message + i, sep_offset);
+                    break;
+                }
+                case GGA::horizontal_dilution: {
+                    location.horizontal_dilution = horizontal_dilution_maker(gps_message + i, sep_offset);
+                    break;
+                }
+                case GGA::altitude: {
+                    location.altitude = altitude_geoid_maker(gps_message + i, sep_offset);
+                    break;
+                }
+                case GGA::altitude_measurement: {
+                    location.altitude_measurement = gps_message[i];
+                    break;
+                }
+                case GGA::geoid_height: {
+                    location.geoid_height = altitude_geoid_maker(gps_message + i, sep_offset);
+                    break;
+                }
+                case GGA::geoid_height_measurement: {
+                    location.geoid_height_measurement = gps_message[i];
+                    break;
+                }
+                default: {
+                    return location;
+                }
             }
-
+            i += sep_offset;
+            GGAindex = static_cast<GGA>(static_cast<uint8_t>(GGAindex) + 1);
         }
-        for (unsigned int i = 0; i < length; i++) {
-            if (gps_message[i] == ',') {
-                comma_counter++;
-                i++;
-            }
-            switch (comma_counter) {
-            case 1: {
-                time.append(gps_message[i]);
-            } break;
-            case 2: {
-                latitude.append(gps_message[i]);
-            } break;
-            case 3: {
-                north_south_hemisphere = gps_message[i];
-            } break;
-            case 4: {
-                longitude.append(gps_message[i]);
-            } break;
-            case 5: {
-                east_west_hemisphere = gps_message[i];
-            } break;
-            case 6: {
-                fix_quality.append(gps_message[i]);
-            } break;
-            case 7: {
-                satellites_tracked.append(gps_message[i]);
-            } break;
-            case 8: {
-                horizontal_dilution.append(gps_message[i]);
-            } break;
-            case 9: {
-                altitude.append(gps_message[i]);
-            } break;
-            case 10: {
-                altitude_measurement = gps_message[i];
-            } break;
-            case 11: {
-                geoid_height.append(gps_message[i]);
-            }
-            case 12: {
-                geoid_height_measurement = gps_message[i];
-            } break;
-            }
-        }
-
-        gga_s location_package;
-        location_package.time = time_maker(time);
-        location_package.latitude = latitude_longitude_maker(latitude);
-        location_package.north_south_hemisphere = north_south_hemisphere;
-        location_package.longitude = latitude_longitude_maker(longitude);
-        location_package.east_west_hemisphere = east_west_hemisphere;
-        location_package.fix_quality = fix_maker(fix_quality);
-        location_package.satellites_tracked =
-            satellite_maker(satellites_tracked);
-        location_package.horizontal_dilution =
-            horizontal_dilution_maker(horizontal_dilution);
-        location_package.altitude = altitude_geoid_maker(altitude);
-        //location_package.altitude_measurement = altitude_measurement;
-        location_package.geoid_height = altitude_geoid_maker(geoid_height);
-        location_package.geoid_height_measurement = geoid_height_measurement;
-
-        return location_package;
+        return location;
     }
 
 
