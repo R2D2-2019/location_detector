@@ -6,6 +6,7 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/../../libraries/hwlib/library",
                 "${workspaceFolder}/../../programs/bmptk/targets/cortex/atmel",
+                "${workspaceFolder}/../../libraries/**",
                 "${workspaceFolder}/../../libraries/USART_library/code/headers",
                 "${workspaceFolder}/code/headers"
             ],
