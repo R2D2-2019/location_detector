@@ -6,6 +6,12 @@
 
 namespace r2d2::location_detector {
 
+    size_t get_offset_separator(const uint8_t *gps_message, const size_t length, const uint8_t separator);
+
+    int32_t atoi(const uint8_t *string, const size_t length);
+
+    float atof(const uint8_t *string, const size_t length);
+
     /// \brief
     /// Class that can interface with any GNSS module that outputs NMEA gga
     /// sentences on an uart/usart serial port.
@@ -29,38 +35,7 @@ namespace r2d2::location_detector {
         /// Function that creates a frame_coordinate_s struct from a gga_s
         /// struct.
         frame_coordinate_s compress(const gga_s &source);
-        /// \brief
-        /// returns time as an integer
-        /// \details
-        /// This function return time as an integer by converting it from a
-        /// hwlib::string
-        uint32_t time_maker(const uint8_t *time, const size_t length);
-        /// \brief
-        /// returns either a longitude or latitude as a float
-        /// \details
-        /// converts a hwlib::string to a calculatable float, useable as a
-        /// coordinate
-        float latitude_longitude_maker(const uint8_t *coordinate, const size_t length);
-        /// \brief
-        /// returns quality of fix
-        /// \details
-        /// converts a hwlib::string to an integer
-        uint8_t fix_maker(const uint8_t *fix, const size_t length);
-        /// \brief
-        /// returns the number of satellites tracked
-        /// \details
-        /// converts a hwlib::string to an integer
-        uint8_t satellite_maker(const uint8_t *satellites, const size_t length);
-        /// \brief
-        /// returns the horizontal dilution
-        /// \details
-        /// returns a float after converting a hwlib::string
-        float horizontal_dilution_maker(const uint8_t *dilution, const size_t length);
-        /// \brief
-        /// returns the altitude or geoid
-        /// \details
-        /// converts a hwlib::string to a float
-        float altitude_geoid_maker(const uint8_t *altitude, const size_t length);
+
         /// \brief
         /// returns a location struct filled with corresponding
         /// information/datatypes \details chops up a hwlib::string and calls
@@ -91,8 +66,6 @@ namespace r2d2::location_detector {
         /// \param GNSS_uart_port uart port to be used to communicate with the
         /// GNSS module.
         uart_nmea_c(r2d2::usart::usart_connection_c &usart_port);
-
-
     };
 
 } // namespace r2d2::location_detector
