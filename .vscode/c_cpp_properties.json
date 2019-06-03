@@ -5,6 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/../../libraries/hwlib/library",
+                "${workspaceFolder}/../../libraries/Catch2/include",
                 "${workspaceFolder}/../../programs/bmptk/targets/cortex/atmel",
                 "${workspaceFolder}/../../libraries/internal_communication/code/headers",
                 "${workspaceFolder}/../../libraries/USART_library/code/headers",
