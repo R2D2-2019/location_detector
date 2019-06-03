@@ -42,37 +42,33 @@ namespace r2d2::location_detector {
 
     frame_coordinate_s uart_nmea_c::get_location() {
         enum get_location_state {
-            clear_buffer,
             wait_for_start,
             get_message_id,
             check_message_id,
             get_sentence
         };
 
-        get_location_state state = clear_buffer;
+        get_location_state state = wait_for_start;
         char uart_input = 0;
 
         while (true) {
             switch (state) {
-            // clear the uart buffer
-            case clear_buffer:
-                while (usart.char_available()) {
-                    usart.receive();
-                }
-                state = wait_for_start;
-                break;
-
             // wait for a $ sign
-            case wait_for_start:
-                if (usart.getc() == '$') {
+            case wait_for_start: {
+                uint8_t c = usart.receive();
+
+                if (c == 36) {
                     gga_sentence[gga_index++] = '$';
                     state = get_message_id;
                 }
+
                 break;
+            }
+
 
             // get the message ID
             case get_message_id:
-                if (usart.char_available()) {
+                if (usart.available()) {
                     gga_sentence[gga_index++] = usart.getc();
                     if (gga_sentence[gga_index - 1] == ',') {
                         // a comma indicates the end of the message id
@@ -84,40 +80,31 @@ namespace r2d2::location_detector {
                         // for.
                     } else if (gga_index > 7) {
                         gga_index = 0;
-                        state = clear_buffer;
+                        state = wait_for_start;
                     }
                 }
                 break;
 
             // check if the message ID is equal to GGA
             case check_message_id:
-                if (gga_sentence[2] == 'G' && gga_sentence[3] == 'G' && gga_sentence[4] == 'A') {
+                if (gga_sentence[3] == 'G' && gga_sentence[4] == 'G' && gga_sentence[5] == 'A') {
                     // if GGA, then send the characters to a string
                     state = get_sentence;
                 } else { // if not GGA, clear the string and wait for a $ sign
                     gga_index = 0;
-                    state = clear_buffer;
+                    state = wait_for_start;
                 }
                 break;
 
-            case get_sentence:
-                if (usart.char_available()) {
-                    uart_input = usart.getc();
+            case get_sentence: {
+                if (usart.available()) {
+                    uart_input = usart.receive();
 
-                    // if a $ is encountered, clear the string and get the
-                    // message ID.
-                    if (uart_input == '$') {
-                        gga_index = 0;
-                        gga_sentence[gga_index++] =('$');
-                        state = get_message_id;
-
-                        // if the character is a carriage return (ascii code
-                        // 13), safe the string and parse it.
-                    } else if (uart_input == 13) {
+                    if (uart_input == '\r' || uart_input == '\n') {
                         last_result = parse_nmea(gga_sentence.begin(), gga_index);
                         return compress(last_result);
                     } else {
-                        gga_sentence[gga_index++] =(uart_input);
+                        gga_sentence[gga_index++] = uart_input;
 
                         // if the maximum number of characters has been reached,
                         // clear the string and wait for a $ sign
@@ -128,6 +115,7 @@ namespace r2d2::location_detector {
                     }
                 }
                 break;
+            }
 
             default:
                 break;
@@ -137,6 +125,7 @@ namespace r2d2::location_detector {
 
     gga_s uart_nmea_c::parse_nmea(const uint8_t *gps_message, const size_t length) {
         enum class GGA : uint8_t {
+            sentence,
             time,
             latitude,
             north_south_hemisphere,
@@ -152,11 +141,15 @@ namespace r2d2::location_detector {
         };
 
         gga_s location;
-        GGA GGAindex = GGA::time;
+        GGA GGAindex = GGA::sentence;
         for (size_t i = 0; i < length; i++){
             size_t sep_offset = get_offset_separator(gps_message + i, length - i, ',');
 
             switch (GGAindex){
+                case GGA::sentence: {
+                    // Current sentence, currently only supports GGA
+                    break;
+                }
                 case GGA::time: {
                     location.time = atoi(gps_message + i, sep_offset);
                     break;
@@ -209,7 +202,7 @@ namespace r2d2::location_detector {
                     return location;
                 }
             }
-            i += sep_offset;
+            i += sep_offset ? sep_offset -1 : 0;
             GGAindex = static_cast<GGA>(static_cast<uint8_t>(GGAindex) + 1);
         }
         return location;
@@ -220,36 +213,20 @@ namespace r2d2::location_detector {
                                           bool north, bool east,
                                           int16_t altitude) {
 
-        uint8_t longitude_degrees = longitude;
-        uint8_t longitude_minutes = (longitude - longitude_degrees) * 60;
-        uint8_t longitude_seconds = (
-            (longitude - longitude_degrees) * 60 - longitude_minutes
-        ) * 60;
+        frame_coordinate_s frame;
 
-        uint8_t longitude_thousandths_second = ((((longitude - longitude_degrees) * 60 - longitude_minutes) * 60) -
-             longitude_seconds) *
-            1000;
+        frame.altitude = altitude;
 
-        uint8_t latitude_degrees = latitude;
-        uint8_t latitude_minutes = (latitude - latitude_degrees) * 60;
-        uint8_t latitude_seconds =
-            ((latitude - latitude_degrees) * 60 - latitude_minutes) * 60;
-        uint8_t latitude_thousandths_second =
-            ((((latitude - latitude_degrees) * 60 - latitude_minutes) * 60) -
-             latitude_seconds) *
-            1000;
+        frame.long_deg = static_cast<uint8_t>(longitude / 100);
+        frame.long_sec = static_cast<uint8_t>(longitude - frame.long_deg * 100);
+        frame.long_thousandth_sec = static_cast<uint16_t>((longitude - static_cast<int>(longitude)) * 1000);
+        frame.east_west_hemisphere = east;
 
-        return frame_coordinate_s{latitude_degrees,
-                                  latitude_minutes,
-                                  latitude_seconds,
-                                  latitude_thousandths_second,
-                                  longitude_degrees,
-                                  longitude_minutes,
-                                  longitude_seconds,
-                                  longitude_thousandths_second,
-                                  north,
-                                  east,
-                                  altitude};
+        frame.lat_deg = static_cast<uint8_t>(latitude / 100);
+        frame.lat_sec = static_cast<uint8_t>(latitude - frame.lat_deg * 100);
+        frame.lat_thousandth_sec = static_cast<uint16_t>((latitude - static_cast<int>(latitude)) * 1000);
+        frame.north_south_hemisphere = north;
+        return frame;
     }
 
 } // namespace r2d2::location_detector
