@@ -5,12 +5,16 @@
 # (c) Wouter van Ooijen (www.voti.nl) 2017
 #
 # This file is in the public domain.
-# 
+#
 #############################################################################
 
 
 # add Catch
 SEARCH            += ../../../libraries/Catch2/single_include/catch2
+
+#add USART_library
+USART               ?= ../../../libraries/USART_library
+include              $(USART)/Makefile.inc
 
 # add internal communication module
 internal_comm     ?= ../../../libraries/internal_communication
