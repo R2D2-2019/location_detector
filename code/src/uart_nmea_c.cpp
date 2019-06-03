@@ -2,14 +2,14 @@
 
 namespace r2d2::location_detector {
 
-    uart_nmea_c::uart_nmea_c(usart::usart_connection_c &GNSS_uart_port)
-        : gga_sentence(), GNSS_uart_port(GNSS_uart_port) {
+    uart_nmea_c::uart_nmea_c(r2d2::usart::usart_connection_c &usart_port)
+        : usart(usart_port) {
     }
 
     frame_coordinate_s uart_nmea_c::compress(const gga_s &source) {
         return compress(source.longitude, source.latitude,
-                        (source.north_south_hemisphere == "N"),
-                        (source.east_west_hemisphere == "E"), source.altitude);
+                        (source.north_south_hemisphere == 'N'),
+                        (source.east_west_hemisphere == 'E'), source.altitude);
     }
 
     frame_coordinate_s uart_nmea_c::get_location() {
@@ -27,15 +27,15 @@ namespace r2d2::location_detector {
             switch (state) {
             // clear the uart buffer
             case clear_buffer:
-                while (GNSS_uart_port.char_available()) {
-                    GNSS_uart_port.receive()
+                while (usart.char_available()) {
+                    usart.receive();
                 }
                 state = wait_for_start;
                 break;
 
             // wait for a $ sign
             case wait_for_start:
-                if (GNSS_uart_port.getc() == '$') {
+                if (usart.getc() == '$') {
                     gga_sentence.append('$');
                     state = get_message_id;
                 }
@@ -43,8 +43,8 @@ namespace r2d2::location_detector {
 
             // get the message ID
             case get_message_id:
-                if (GNSS_uart_port.char_available()) {
-                    gga_sentence.append(GNSS_uart_port.getc());
+                if (usart.char_available()) {
+                    gga_sentence.append(usart.getc());
                     if (gga_sentence[gga_sentence.length() - 1] == ',') {
                         // a comma indicates the end of the message id
                         state = check_message_id;
@@ -72,8 +72,8 @@ namespace r2d2::location_detector {
                 break;
 
             case get_sentence:
-                if (GNSS_uart_port.char_available()) {
-                    uart_input = GNSS_uart_port.getc();
+                if (usart.char_available()) {
+                    uart_input = usart.getc();
 
                     // if a $ is encountered, clear the string and get the
                     // message ID.
@@ -280,11 +280,48 @@ namespace r2d2::location_detector {
         location_package.horizontal_dilution =
             horizontal_dilution_maker(horizontal_dilution);
         location_package.altitude = altitude_geoid_maker(altitude);
-        location_package.altitude_measurement = altitude_measurement;
+        //location_package.altitude_measurement = altitude_measurement;
         location_package.geoid_height = altitude_geoid_maker(geoid_height);
         location_package.geoid_height_measurement = geoid_height_measurement;
 
         return location_package;
+    }
+
+
+    frame_coordinate_s uart_nmea_c::compress(float longitude, float latitude,
+                                          bool north, bool east,
+                                          int16_t altitude) {
+
+        uint8_t longitude_degrees = longitude;
+        uint8_t longitude_minutes = (longitude - longitude_degrees) * 60;
+        uint8_t longitude_seconds = (
+            (longitude - longitude_degrees) * 60 - longitude_minutes
+        ) * 60;
+
+        uint8_t longitude_thousandths_second = ((((longitude - longitude_degrees) * 60 - longitude_minutes) * 60) -
+             longitude_seconds) *
+            1000;
+
+        uint8_t latitude_degrees = latitude;
+        uint8_t latitude_minutes = (latitude - latitude_degrees) * 60;
+        uint8_t latitude_seconds =
+            ((latitude - latitude_degrees) * 60 - latitude_minutes) * 60;
+        uint8_t latitude_thousandths_second =
+            ((((latitude - latitude_degrees) * 60 - latitude_minutes) * 60) -
+             latitude_seconds) *
+            1000;
+
+        return frame_coordinate_s{latitude_degrees,
+                                  latitude_minutes,
+                                  latitude_seconds,
+                                  latitude_thousandths_second,
+                                  longitude_degrees,
+                                  longitude_minutes,
+                                  longitude_seconds,
+                                  longitude_thousandths_second,
+                                  north,
+                                  east,
+                                  altitude};
     }
 
 } // namespace r2d2::location_detector

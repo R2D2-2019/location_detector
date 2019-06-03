@@ -1,7 +1,7 @@
 #pragma once
 
-#include "gga_s.hpp"
-#include "location_detector.hpp"
+#include <gga_s.hpp>
+#include <frame_types.hpp>
 #include <usart_connection.hpp>
 
 namespace r2d2::location_detector {
@@ -17,10 +17,10 @@ namespace r2d2::location_detector {
     /// request it will send a frame containing information about the location
     /// on the CAN-bus. This class will only work if the GNSS module outputs
     /// NMEA gga messages.
-    class uart_nmea_c : public module_c {
+    class uart_nmea_c {
     private:
-        hwlib::string<100> gga_sentence;
-        usart::usart_connection_c &GNSS_uart_port;
+        hwlib::string<100> gga_sentence = {};
+        r2d2::usart::usart_connection_c &usart;
         gga_s last_result; // last result, because we may want to optimize this
                            // by only updating the location after a certain
                            // amount of time.
@@ -65,21 +65,33 @@ namespace r2d2::location_detector {
         /// information/datatypes \details chops up a hwlib::string and calls
         /// other 'maker' functions to fill struct.
         gga_s parse_nmea(const hwlib::string<0> &gps_message);
+        /**
+         * \brief This method is used to manually make coordinate frames.
+         *
+         * \param longitude
+         * \param latitude
+         * \param north
+         * \param south
+         * \param altitude
+         */
+        frame_coordinate_s compress(float longitude, float latitude, bool north,
+                                    bool east, int16_t altitude);
 
-    protected:
+    public:
         /// \brief
         /// Function that returns the current location.
         /// \details
         /// get_location first waits for a NMEA GGA sentence on the uart port,
         /// which it then parses. The result of the parse is returned.
-        frame_coordinate_s get_location() override;
+        frame_coordinate_s get_location();
 
-    public:
         /// \brief
         /// uart_nmea_c contructor
         /// \param GNSS_uart_port uart port to be used to communicate with the
         /// GNSS module.
-        uart_nmea_c(usart::usart_connection_c &GNSS_uart_port);
+        uart_nmea_c(r2d2::usart::usart_connection_c &usart_port);
+
+        
     };
 
 } // namespace r2d2::location_detector
