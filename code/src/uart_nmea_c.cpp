@@ -27,7 +27,7 @@ namespace r2d2::location_detector {
     float atof(const uint8_t *string, const size_t length) {
         size_t offset = get_offset_separator(string, length, '.');
 
-        return atoi(string, length) / pow(float(10), int(length - offset));
+        return atoi(string, length) / (offset ? pow(float(10), int(length - offset) - 1) : 1);
     }
 
     uart_nmea_c::uart_nmea_c(r2d2::usart::usart_connection_c &usart_port)
