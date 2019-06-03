@@ -209,21 +209,55 @@ namespace r2d2::location_detector {
         }
         return temp_altitude / 10;
     }
-    gga_s uart_nmea_c::parse_nmea(const hwlib::string<0> &gps_message) {
-        uint8_t comma_counter = 0;
-        hwlib::string<10> time;
-        hwlib::string<10> latitude;
-        char north_south_hemisphere;
-        hwlib::string<10> longitude;
-        char east_west_hemisphere;
-        hwlib::string<10> fix_quality;
-        hwlib::string<10> satellites_tracked;
-        hwlib::string<10> horizontal_dilution;
-        hwlib::string<10> altitude;
-        char altitude_measurement;
-        hwlib::string<10> geoid_height;
-        char geoid_height_measurement;
-        for (unsigned int i = 0; i < gps_message.length(); i++) {
+
+    size_t get_offset_separator(const uint8_t *gps_message, const size_t length, const uint8_t separator){
+        for(size_t i = 0; i < length; i++){
+            if (gps_message[i] == separator){
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    gga_s uart_nmea_c::parse_nmea(const uint8_t *gps_message, const size_t length) {
+        // uint8_t comma_counter = 0;
+        // hwlib::string<10> time;
+        // hwlib::string<10> latitude;
+        // char north_south_hemisphere;
+        // hwlib::string<10> longitude;
+        // char east_west_hemisphere;
+        // hwlib::string<10> fix_quality;
+        // hwlib::string<10> satellites_tracked;
+        // hwlib::string<10> horizontal_dilution;
+        // hwlib::string<10> altitude;
+        // char altitude_measurement;
+        // hwlib::string<10> geoid_height;
+        // char geoid_height_measurement;
+        enum GGA : uint8_t {
+            time,
+            latitude,
+            north_south_hemisphere,
+            longitude,
+            east_west_hemisphere,
+            fix_quality,
+            satellites_tracked,
+            horizontal_dilution,
+            altitude,
+            altitude_measurement,
+            geoid_height,
+            geoid_height_measurement
+        };
+
+        GGA GGAindex = time;
+        for (size_t i = 0; i < length; i++){
+            size_t offset = get_offset_separator(gps_message + i, length, ',');
+
+            switch (GGAindex){
+                
+            }
+
+        }
+        for (unsigned int i = 0; i < length; i++) {
             if (gps_message[i] == ',') {
                 comma_counter++;
                 i++;
