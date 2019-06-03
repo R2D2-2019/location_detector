@@ -14,7 +14,7 @@ namespace r2d2::location_detector {
         uint8_t satellites_tracked;
         float horizontal_dilution;
         float altitude;
-        char altidude_measurement;
+        char altitude_measurement;
         float geoid_height;
         char geoid_height_measurement;
     };
