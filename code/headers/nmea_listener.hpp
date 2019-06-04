@@ -18,7 +18,7 @@ namespace r2d2::location {
         uint8_t buffer[buffer_size];
 
         /**
-         * @brief
+         * @brief index where the next location of data should be
          *
          */
         size_t index = 0;
@@ -28,12 +28,6 @@ namespace r2d2::location {
          *
          */
         bool available;
-
-        /**
-         * @brief bool for bookkeeping if we are in the middle of a string
-         *
-         */
-        bool has_startbyte = false;
 
     public:
         nmea_listener(usart::usart_connection_c &usart) : usart(usart) {
@@ -103,19 +97,14 @@ namespace r2d2::location {
                 // receive data from the usart
                 uint8_t data = usart.receive();
 
+                if (data != start_byte && !index) {
+                    continue;
+                }
+
                 if (data == end_byte) {
                     // we now have a nmea string
                     available = true;
-                    has_startbyte = false;
                     return;
-                }
-
-                if (data == start_byte) {
-                    has_startbyte = true;
-                }
-
-                if (!has_startbyte) {
-                    continue;
                 }
 
                 buffer[index++] = data;
@@ -123,7 +112,6 @@ namespace r2d2::location {
                 // check if something went wrong as a nmea string shouldn't be
                 // buffer_size long
                 if (index >= buffer_size) {
-                    has_startbyte = false;
                     return;
                 }
             }
