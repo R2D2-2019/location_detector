@@ -4,4 +4,13 @@
 *.c
 *.map
 *.ld
-
+*.cbp
+*.lss
+*.exe
+*.lst
+.idea/
+cmake*/
+CMakeLists.txt
+settings.json
+.vscode/ipch/
+test/*.exe

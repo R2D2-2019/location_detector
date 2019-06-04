@@ -5,7 +5,7 @@
 # (c) Wouter van Ooijen (www.voti.nl) 2017
 #
 # This file is in the public domain.
-# 
+#
 #############################################################################
 
 # settings for Arduino Due projects
@@ -17,4 +17,3 @@ HEAP              ?= BMPTK
 
 # defer to the Makefile.link
 include           $(RELATIVE)/Makefile.link
-
