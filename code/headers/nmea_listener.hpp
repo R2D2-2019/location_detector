@@ -33,7 +33,7 @@ namespace r2d2::location {
         nmea_listener_c(usart::usart_connection_c &usart) : usart(usart) {
         }
 
-        constexpr bool nmea_available() {
+        constexpr bool nmea_available() const {
             return available;
         }
 
@@ -42,7 +42,7 @@ namespace r2d2::location {
          *
          * @return const uint8_t*
          */
-        const uint8_t *get_nmea_string() {
+        const uint8_t *get_nmea_string() const {
             if (!nmea_available()) {
                 return nullptr;
             }
@@ -77,7 +77,7 @@ namespace r2d2::location {
          * @brief returns the length of the current nmea string
          *
          */
-        constexpr size_t length() {
+        constexpr size_t length() const {
             return index;
         }
 
