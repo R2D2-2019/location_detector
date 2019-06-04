@@ -33,7 +33,7 @@ namespace r2d2::location {
         nmea_listener_c(usart::usart_connection_c &usart) : usart(usart) {
         }
 
-        bool nmea_available() {
+        constexpr bool nmea_available() {
             return available;
         }
 
@@ -55,7 +55,7 @@ namespace r2d2::location {
          * usart.
          *
          */
-        void read_nmea_string() {
+        constexpr void read_nmea_string() {
             available = false;
             index = 0;
         }
@@ -77,7 +77,7 @@ namespace r2d2::location {
          * @brief returns the length of the current nmea string
          *
          */
-        size_t length() {
+        constexpr size_t length() {
             return index;
         }
 
