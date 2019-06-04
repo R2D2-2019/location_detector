@@ -133,7 +133,7 @@ TEST_CASE("usart nmea parser convert frame test", "[nmea_parser]") {
 
     REQUIRE(frame.lat_deg == 48);
     REQUIRE(frame.lat_min == 7);
-    REQUIRE(frame.lat_tenthousandth_min == 38);
+    REQUIRE(frame.lat_tenthousandth_min == 380);
     REQUIRE(frame.north_south_hemisphere == true);
 
     REQUIRE(frame.long_deg == 11);

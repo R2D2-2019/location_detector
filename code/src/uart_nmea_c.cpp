@@ -20,13 +20,13 @@ namespace r2d2::location {
         frame.long_deg = static_cast<uint8_t>(longitude / 100);
         frame.long_min = static_cast<uint8_t>(longitude - frame.long_deg * 100);
         frame.long_tenthousandth_min = static_cast<uint16_t>(
-            (longitude - static_cast<int>(longitude)) * 1000);
+            (longitude - static_cast<int>(longitude)) * 10'000);
         frame.east_west_hemisphere = east;
 
         frame.lat_deg = static_cast<uint8_t>(latitude / 100);
         frame.lat_min = static_cast<uint8_t>(latitude - frame.lat_deg * 100);
         frame.lat_tenthousandth_min = static_cast<uint16_t>(
-            (latitude - static_cast<int>(latitude)) * 1000);
+            (latitude - static_cast<int>(latitude)) * 10'000);
         frame.north_south_hemisphere = north;
 
         return frame;
