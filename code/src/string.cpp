@@ -2,10 +2,9 @@
 #include <string.hpp>
 
 namespace r2d2::string {
-    size_t get_offset_separator(const uint8_t *gps_message, 
-                                const size_t length,
+    size_t get_offset_separator(const uint8_t *gps_message, const size_t length,
                                 const uint8_t separator) {
-                                    
+
         for (size_t i = 0; i < length; i++) {
             if (gps_message[i] == separator) {
                 return i + 1;

@@ -25,11 +25,12 @@ namespace r2d2::location {
     public:
         /**
          * @brief converts a gga string to a gga_struct
-         * 
-         * @param gps_message 
-         * @param length 
-         * @return gga_s 
+         *
+         * @param gps_message
+         * @param length
+         * @return gga_s
          */
-        static gga_s parse_nmea(const uint8_t *gps_message, const size_t length);
+        static gga_s parse_nmea(const uint8_t *gps_message,
+                                const size_t length);
     };
 } // namespace r2d2::location
