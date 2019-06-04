@@ -1,8 +1,8 @@
+#include <comm.hpp>
+#include <hardware_usart.hpp>
 #include <hwlib.hpp>
 #include <module.hpp>
 #include <uart_nmea.hpp>
-#include <hardware_usart.hpp>
-#include <comm.hpp>
 
 int main(void) {
     // kill the watchdog
@@ -18,7 +18,7 @@ int main(void) {
 
     r2d2::location::module_c module(comm, nmea);
 
-    while(true) {
+    while (true) {
         module.process();
     }
 }
