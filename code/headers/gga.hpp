@@ -2,7 +2,7 @@
 
 #include <hwlib.hpp>
 
-namespace r2d2::location_detector {
+namespace r2d2::location {
 
     struct gga_s {
         uint32_t time;
@@ -19,4 +19,4 @@ namespace r2d2::location_detector {
         char geoid_height_measurement;
     };
 
-} // namespace r2d2::location_detector
+} // namespace r2d2::location
