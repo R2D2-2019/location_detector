@@ -3,7 +3,13 @@
 #include <hwlib.hpp>
 
 namespace r2d2::location {
-
+    /**
+     * @brief this struct contains essential fix data which provide 3D location
+     * and accuracy data
+     *
+     * https://www.gpsinformation.org/dale/nmea.htm#GGA
+     *
+     */
     struct gga_s {
         uint32_t time;
         float latitude;
