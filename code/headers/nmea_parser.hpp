@@ -30,7 +30,6 @@ namespace r2d2::location {
          * @param length
          * @return gga_s
          */
-        static gga_s parse_nmea(const uint8_t *gps_message,
-                                const size_t length);
+        static gga_s parse_nmea(const uint8_t *gps_message, const size_t length);
     };
 } // namespace r2d2::location

@@ -12,8 +12,7 @@ namespace r2d2::location {
         GGA GGAindex = GGA::sentence;
 
         for (size_t i = 0; i < length; i++) {
-            size_t sep_offset =
-                get_offset_separator(gps_message + i, length - i, ',');
+            size_t sep_offset = get_offset_separator(gps_message + i, length - i, ',');
 
             switch (GGAindex) {
             case GGA::sentence: {
@@ -58,8 +57,7 @@ namespace r2d2::location {
                 break;
             }
             case GGA::horizontal_dilution: {
-                location.horizontal_dilution =
-                    atof(gps_message + i, sep_offset);
+                location.horizontal_dilution = atof(gps_message + i, sep_offset);
                 break;
             }
             case GGA::altitude: {
@@ -78,8 +76,11 @@ namespace r2d2::location {
                 location.geoid_height_measurement = gps_message[i];
                 break;
             }
-            default: { return location; }
+            default: { 
+                return location; 
             }
+            }
+
             i += (sep_offset ? sep_offset - 1 : 0);
             GGAindex = static_cast<GGA>(static_cast<uint8_t>(GGAindex) + 1);
         }
