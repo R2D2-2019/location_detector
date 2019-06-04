@@ -4,6 +4,7 @@
 #include <frame_types.hpp>
 #include <usart_connection.hpp>
 #include <nmea_parser.hpp>
+#include <nmea_listener.hpp>
 
 namespace r2d2::location {
     /// \brief
@@ -19,16 +20,36 @@ namespace r2d2::location {
     /// NMEA gga messages.
     class uart_nmea_c {
     private:
-        std::array<uint8_t, 100> gga_sentence = {};
-        size_t gga_index = 0;
-        r2d2::usart::usart_connection_c &usart;
-        gga_s last_result; // last result, because we may want to optimize this
-                           // by only updating the location after a certain
-                           // amount of time.
+        /**
+         * @brief Nmea parser for parsing all the strings
+         * 
+         */
+        nmea_parser_c parser;
+
+        /**
+         * @brief usart listener for getting a string of nmea data.
+         * 
+         */
+        nmea_listener listener;
+
+    public:
+        /// \brief
+        /// uart_nmea_c contructor
+        /// \param GNSS_uart_port uart port to be used to communicate with the
+        /// GNSS module.
+        uart_nmea_c(r2d2::usart::usart_connection_c &usart_port);
+
+        /// \brief
+        /// Function that returns the current location.
+        /// \details
+        /// get_location first waits for a NMEA GGA sentence on the uart port,
+        /// which it then parses. The result of the parse is returned.
+        gga_s get_location();
+
         /// \brief
         /// Function that creates a frame_coordinate_s struct from a gga_s
         /// struct.
-        frame_coordinate_s compress(const gga_s &source);
+        frame_coordinate_s gga_to_frame(const gga_s &source);
 
         /**
          * \brief This method is used to manually make coordinate frames.
@@ -39,24 +60,9 @@ namespace r2d2::location {
          * \param south
          * \param altitude
          */
-        frame_coordinate_s compress(float longitude, float latitude, bool north,
+        frame_coordinate_s coordinates_to_frame(float longitude, float latitude, bool north,
                                     bool east, int16_t altitude);
 
-        nmea_parser_c parser;
-
-    public:
-        /// \brief
-        /// Function that returns the current location.
-        /// \details
-        /// get_location first waits for a NMEA GGA sentence on the uart port,
-        /// which it then parses. The result of the parse is returned.
-        frame_coordinate_s get_location();
-
-        /// \brief
-        /// uart_nmea_c contructor
-        /// \param GNSS_uart_port uart port to be used to communicate with the
-        /// GNSS module.
-        uart_nmea_c(r2d2::usart::usart_connection_c &usart_port);
     };
 
 } // namespace r2d2::location
