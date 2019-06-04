@@ -1,6 +1,6 @@
 #include "module.hpp"
 
-namespace r2d2::location_detector {
+namespace r2d2::location {
     void module_c::process() {
         // check for frame
         while (comm.has_data()) {
@@ -15,4 +15,4 @@ namespace r2d2::location_detector {
         }
     }
 
-} // namespace r2d2::location_detector
+} // namespace r2d2::location

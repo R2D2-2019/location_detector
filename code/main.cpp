@@ -14,9 +14,9 @@ int main(void) {
 
     r2d2::usart::hardware_usart_c<r2d2::usart::usart0> usart(9600);
 
-    r2d2::location_detector::uart_nmea_c nmea(usart);
+    r2d2::location::uart_nmea_c nmea(usart);
 
-    r2d2::location_detector::module_c module(comm, nmea);
+    r2d2::location::module_c module(comm, nmea);
 
     while(true) {
         module.process();
