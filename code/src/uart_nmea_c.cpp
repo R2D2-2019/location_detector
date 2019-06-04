@@ -1,35 +1,9 @@
 #include <uart_nmea_c.hpp>
 #include <cstdint>
 #include <cmath>
+#include <string.hpp>
 
-namespace r2d2::location_detector {
-    size_t get_offset_separator(const uint8_t *gps_message, const size_t length, const uint8_t separator) {
-        for(size_t i = 0; i < length; i++){
-            if (gps_message[i] == separator){
-                return i + 1;
-            }
-        }
-        return 0;
-    }
-
-    int32_t atoi(const uint8_t *string, const size_t length) {
-        int32_t res = 0;
-
-        for (size_t i = 0; i < length; i++) {
-            if (string[i] >= '0' && string[i] <= '9') {
-                res = res * 10 + string[i] - '0';
-            }
-        }
-
-        return res * (length ? (string[0] == '-' ? -1 : 1) : 1);
-    }
-
-    float atof(const uint8_t *string, const size_t length) {
-        size_t offset = get_offset_separator(string, length, '.');
-
-        return atoi(string, length) / (offset ? pow(float(10), int(length - offset) - 1) : 1);
-    }
-
+namespace r2d2::location {
     uart_nmea_c::uart_nmea_c(r2d2::usart::usart_connection_c &usart_port)
         : usart(usart_port) {
     }
@@ -101,7 +75,7 @@ namespace r2d2::location_detector {
                     uart_input = usart.receive();
 
                     if (uart_input == '\r' || uart_input == '\n') {
-                        last_result = parse_nmea(gga_sentence.begin(), gga_index);
+                        last_result = parser.parse_nmea(gga_sentence.begin(), gga_index);
                         return compress(last_result);
                     } else {
                         gga_sentence[gga_index++] = uart_input;
@@ -123,92 +97,6 @@ namespace r2d2::location_detector {
         }
     }
 
-    gga_s uart_nmea_c::parse_nmea(const uint8_t *gps_message, const size_t length) {
-        enum class GGA : uint8_t {
-            sentence,
-            time,
-            latitude,
-            north_south_hemisphere,
-            longitude,
-            east_west_hemisphere,
-            fix_quality,
-            satellites_tracked,
-            horizontal_dilution,
-            altitude,
-            altitude_measurement,
-            geoid_height,
-            geoid_height_measurement
-        };
-
-        gga_s location;
-        GGA GGAindex = GGA::sentence;
-        for (size_t i = 0; i < length; i++){
-            size_t sep_offset = get_offset_separator(gps_message + i, length - i, ',');
-
-            switch (GGAindex){
-                case GGA::sentence: {
-                    // Current sentence, currently only supports GGA
-                    break;
-                }
-                case GGA::time: {
-                    location.time = atoi(gps_message + i, sep_offset);
-                    break;
-                }
-                case GGA::latitude: {
-                    location.latitude = atof(gps_message + i, sep_offset);
-                    break;
-                }
-                case GGA::north_south_hemisphere: {
-                    location.north_south_hemisphere = gps_message[i];
-                    break;
-                }
-                case GGA::longitude: {
-                    location.longitude = atof(gps_message + i, sep_offset);
-                    break;
-                }
-                case GGA::east_west_hemisphere: {
-                    location.east_west_hemisphere = gps_message[i];
-                    break;
-                }
-                case GGA::fix_quality: {
-                    location.fix_quality = atoi(gps_message + i, sep_offset);
-                    break;
-                }
-                case GGA::satellites_tracked: {
-                    location.satellites_tracked = atoi(gps_message + i, sep_offset);
-                    break;
-                }
-                case GGA::horizontal_dilution: {
-                    location.horizontal_dilution = atof(gps_message + i, sep_offset);
-                    break;
-                }
-                case GGA::altitude: {
-                    location.altitude = atof(gps_message + i, sep_offset);
-                    break;
-                }
-                case GGA::altitude_measurement: {
-                    location.altitude_measurement = gps_message[i];
-                    break;
-                }
-                case GGA::geoid_height: {
-                    location.geoid_height = atof(gps_message + i, sep_offset);
-                    break;
-                }
-                case GGA::geoid_height_measurement: {
-                    location.geoid_height_measurement = gps_message[i];
-                    break;
-                }
-                default: {
-                    return location;
-                }
-            }
-            i += sep_offset ? sep_offset -1 : 0;
-            GGAindex = static_cast<GGA>(static_cast<uint8_t>(GGAindex) + 1);
-        }
-        return location;
-    }
-
-
     frame_coordinate_s uart_nmea_c::compress(float longitude, float latitude,
                                           bool north, bool east,
                                           int16_t altitude) {
@@ -229,4 +117,4 @@ namespace r2d2::location_detector {
         return frame;
     }
 
-} // namespace r2d2::location_detector
+} // namespace r2d2::location

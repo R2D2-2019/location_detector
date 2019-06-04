@@ -1,17 +1,11 @@
 #pragma once
 
-#include <gga_s.hpp>
+#include <gga.hpp>
 #include <frame_types.hpp>
 #include <usart_connection.hpp>
+#include <nmea_parser.hpp>
 
-namespace r2d2::location_detector {
-
-    size_t get_offset_separator(const uint8_t *gps_message, const size_t length, const uint8_t separator);
-
-    int32_t atoi(const uint8_t *string, const size_t length);
-
-    float atof(const uint8_t *string, const size_t length);
-
+namespace r2d2::location {
     /// \brief
     /// Class that can interface with any GNSS module that outputs NMEA gga
     /// sentences on an uart/usart serial port.
@@ -36,11 +30,6 @@ namespace r2d2::location_detector {
         /// struct.
         frame_coordinate_s compress(const gga_s &source);
 
-        /// \brief
-        /// returns a location struct filled with corresponding
-        /// information/datatypes \details chops up a hwlib::string and calls
-        /// other 'maker' functions to fill struct.
-        gga_s parse_nmea(const uint8_t *gps_message, const size_t length);
         /**
          * \brief This method is used to manually make coordinate frames.
          *
@@ -52,6 +41,8 @@ namespace r2d2::location_detector {
          */
         frame_coordinate_s compress(float longitude, float latitude, bool north,
                                     bool east, int16_t altitude);
+
+        nmea_parser_c parser;
 
     public:
         /// \brief
@@ -68,4 +59,4 @@ namespace r2d2::location_detector {
         uart_nmea_c(r2d2::usart::usart_connection_c &usart_port);
     };
 
-} // namespace r2d2::location_detector
+} // namespace r2d2::location
