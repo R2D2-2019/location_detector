@@ -63,6 +63,7 @@ namespace r2d2::location {
          */
         void read_nmea_string() {
             available = false;
+            index = 0;
         }
 
         /**
@@ -79,6 +80,14 @@ namespace r2d2::location {
         }
 
         /**
+         * @brief returns the length of the current nmea string
+         * 
+         */
+        size_t length() {
+            return index;
+        }
+
+        /**
          * @brief update the internal buffer with the data from the usart
          * buffer. This won't update the buffer if a string is already present
          * in the local buffer.
@@ -89,8 +98,6 @@ namespace r2d2::location {
             if (nmea_available()) {
                 return;
             }
-
-            size_t i = 0;
 
             while (usart.available()) {
                 // receive data from the usart
@@ -111,11 +118,11 @@ namespace r2d2::location {
                     continue;
                 }
 
-                buffer[i++] = data;
+                buffer[index++] = data;
 
                 // check if something went wrong as a nmea string shouldn't be
                 // buffer_size long
-                if (i >= buffer_size) {
+                if (index >= buffer_size) {
                     has_startbyte = false;
                     return;
                 }
