@@ -55,7 +55,7 @@ namespace r2d2::location {
          * usart.
          *
          */
-        constexpr void read_nmea_string() {
+        constexpr void mark_as_read() {
             available = false;
             index = 0;
         }

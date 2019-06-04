@@ -76,7 +76,7 @@ namespace r2d2::location {
                     state = wait_for_string;
 
                     // mark string as read to wait for a new one
-                    listener.read_nmea_string();
+                    listener.mark_as_read();
 
                     break;
                 }
@@ -94,7 +94,7 @@ namespace r2d2::location {
                 state = wait_for_string;
 
                 // mark string as read to wait for a new one
-                listener.read_nmea_string();                
+                listener.mark_as_read();                
 
                 return gga;
             }
