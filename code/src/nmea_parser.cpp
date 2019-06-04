@@ -1,10 +1,6 @@
 #include <nmea_parser.hpp>
 #include <string.hpp>
 
-using r2d2::string::atof;
-using r2d2::string::atoi;
-using r2d2::string::get_offset_separator;
-
 namespace r2d2::location {
     gga_s nmea_parser_c::parse_nmea(const uint8_t *gps_message,
                                     const size_t length) {

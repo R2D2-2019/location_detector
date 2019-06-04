@@ -1,7 +1,7 @@
 #include <cmath>
 #include <string.hpp>
 
-namespace r2d2::string {
+namespace r2d2::location {
     size_t get_offset_separator(const uint8_t *gps_message, 
                                 const size_t length,
                                 const uint8_t separator) {
@@ -36,4 +36,4 @@ namespace r2d2::string {
         return atoi(string, length) /
                (offset ? pow(float(10), int(length - offset) - 1) : 1);
     }
-} // namespace r2d2::string
+} // namespace r2d2::location
