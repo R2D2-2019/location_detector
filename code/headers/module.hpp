@@ -28,9 +28,6 @@ namespace r2d2::location {
         /// When a location request is received the location will be determined
         /// and send in a frame_coordinate_s frame over the CAN-bus.
         void process();
-
-    protected:
-
     };
 
 } // namespace r2d2::location
