@@ -7,17 +7,15 @@
 namespace r2d2::location {
 
     /// \brief
-    /// This class provides the interface for the location_detection module.
-    /// \details
-    /// TODO: what is the input (frame) of this module?
-    /// what is the output (frame) of this module?
+    /// This class responds on a frame_coordinate_s request with a frame that
+    /// has the location
     class module_c : public base_module_c {
     private:
         r2d2::location::uart_nmea_c &nmea;
 
         /**
          * @brief bool to store if we got a request
-         * 
+         *
          */
         bool request_triggered = false;
 
@@ -26,7 +24,9 @@ namespace r2d2::location {
         /// location_detector module_c constructor.
         module_c(r2d2::base_comm_c &comm, r2d2::location::uart_nmea_c &nmea)
             : base_module_c(comm), nmea(nmea) {
-            // TODO: what frames are we listening for?
+
+            // Set up listeners
+            comm.listen_for_frames({r2d2::frame_type::COORDINATE});
         }
 
         /// \brief
