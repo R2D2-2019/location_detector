@@ -13,12 +13,19 @@ namespace r2d2::location {
     /// what is the output (frame) of this module?
     class module_c : public base_module_c {
     private:
-       r2d2::location::uart_nmea_c &nmea;
+        r2d2::location::uart_nmea_c &nmea;
+
+        /**
+         * @brief bool to store if we got a request
+         * 
+         */
+        bool request_triggered = false;
 
     public:
         /// \brief
         /// location_detector module_c constructor.
-        module_c(r2d2::base_comm_c &comm, r2d2::location::uart_nmea_c &nmea) : base_module_c(comm), nmea(nmea) {
+        module_c(r2d2::base_comm_c &comm, r2d2::location::uart_nmea_c &nmea)
+            : base_module_c(comm), nmea(nmea) {
             // TODO: what frames are we listening for?
         }
 
