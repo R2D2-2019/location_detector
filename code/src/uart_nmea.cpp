@@ -95,6 +95,9 @@ namespace r2d2::location {
 
                 state = wait_for_string;
 
+                // mark string as read to wait for a new one
+                listener.read_nmea_string();                
+
                 return gga;
             }
             }
