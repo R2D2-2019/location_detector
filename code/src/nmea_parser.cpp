@@ -16,7 +16,16 @@ namespace r2d2::location {
             switch (GGAindex){
                 case GGA::sentence: {
                     // Current sentence, currently only supports GGA
-                    break;
+
+                    // check if the message ID is equal to GGA
+                    if (gps_message[3] == 'G' && gps_message[4] == 'G' &&
+                        gps_message[5] == 'A') {
+                            // if GGA, go to next step
+                            break;
+                    }
+
+                    // if not GGA, return
+                    return gga_s{};
                 }
                 case GGA::time: {
                     location.time = atoi(gps_message + i, sep_offset);
