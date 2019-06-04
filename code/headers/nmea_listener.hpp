@@ -3,7 +3,7 @@
 #include <usart_connection.hpp>
 
 namespace r2d2::location {
-    class nmea_listener {
+    class nmea_listener_c {
     protected:
         constexpr static uint8_t start_byte = '$';
         constexpr static uint8_t end_byte = '\n';
@@ -30,7 +30,7 @@ namespace r2d2::location {
         bool available;
 
     public:
-        nmea_listener(usart::usart_connection_c &usart) : usart(usart) {
+        nmea_listener_c(usart::usart_connection_c &usart) : usart(usart) {
         }
 
         bool nmea_available() {
@@ -75,7 +75,7 @@ namespace r2d2::location {
 
         /**
          * @brief returns the length of the current nmea string
-         * 
+         *
          */
         size_t length() {
             return index;

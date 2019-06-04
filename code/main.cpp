@@ -1,6 +1,6 @@
 #include <hwlib.hpp>
 #include <module.hpp>
-#include <uart_nmea_c.hpp>
+#include <uart_nmea.hpp>
 #include <hardware_usart.hpp>
 #include <comm.hpp>
 

@@ -1,7 +1,7 @@
 #include <cmath>
 #include <cstdint>
 #include <string.hpp>
-#include <uart_nmea_c.hpp>
+#include <uart_nmea.hpp>
 
 namespace r2d2::location {
     uart_nmea_c::uart_nmea_c(r2d2::usart::usart_connection_c &usart_port)
@@ -34,7 +34,7 @@ namespace r2d2::location {
 
     frame_coordinate_s uart_nmea_c::gga_to_frame(const gga_s &source) {
         return coordinates_to_frame(
-            source.longitude, 
+            source.longitude,
             source.latitude,
             (source.north_south_hemisphere == 'N'),
             (source.east_west_hemisphere == 'E'),

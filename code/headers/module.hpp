@@ -2,7 +2,7 @@
 
 #include <base_module.hpp>
 #include <hwlib.hpp>
-#include <uart_nmea_c.hpp>
+#include <uart_nmea.hpp>
 
 namespace r2d2::location {
 

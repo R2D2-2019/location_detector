@@ -26,7 +26,7 @@ namespace r2d2::location {
          * @brief usart listener for getting a string of nmea data.
          *
          */
-        nmea_listener listener;
+        nmea_listener_c listener;
 
     public:
         /// \brief

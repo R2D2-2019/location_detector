@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
-#include <uart_nmea_c.hpp>
+#include <uart_nmea.hpp>
 #include <test_usart.hpp>
 #include <string.hpp>
 
@@ -62,12 +62,12 @@ TEST_CASE("nmea listener test", "[nmea listener]") {
     auto string = "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47\n";
 
     // add a string to the recieve buffer
-    // https://www.gpsinformation.org/dale/nmea.htm#GGA    
+    // https://www.gpsinformation.org/dale/nmea.htm#GGA
     usart.set_receive_string(string);
 
     REQUIRE(usart.available() > 10);
 
-    auto listener = location::nmea_listener(usart);
+    auto listener = location::nmea_listener_c(usart);
 
     // update the buffer
     listener.update_buffer();
@@ -105,7 +105,7 @@ TEST_CASE("usart nmea parser test", "[nmea_parser]") {
     REQUIRE(gga.latitude == 4807.038f);
     REQUIRE(gga.north_south_hemisphere == 'N');
     REQUIRE(gga.longitude == 01131.000f);
-    REQUIRE(gga.east_west_hemisphere == 'E');    
+    REQUIRE(gga.east_west_hemisphere == 'E');
     REQUIRE(gga.fix_quality == 1);
     REQUIRE(gga.satellites_tracked == 8);
     REQUIRE(gga.horizontal_dilution == 0.9f);
@@ -128,7 +128,7 @@ TEST_CASE("usart nmea parser convert frame test", "[nmea_parser]") {
     auto nmea = location::uart_nmea_c(usart);
 
     auto gga = nmea.get_location();
-    
+
     auto frame = nmea.gga_to_frame(gga);
 
     REQUIRE(frame.lat_deg == 48);
