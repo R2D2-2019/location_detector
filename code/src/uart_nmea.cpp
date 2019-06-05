@@ -65,7 +65,7 @@ namespace r2d2::location {
             case check_string: {
                 // get the offset of the first ',' as
                 // a comma indicates the end of the message id
-                size_t offset_sep = string::get_offset_separator(
+                size_t offset_sep = get_offset_separator(
                     listener.get_nmea_string(), listener.length(), ',');
 
                 if (offset_sep > 7 || offset_sep == 0) {
@@ -76,7 +76,7 @@ namespace r2d2::location {
                     state = wait_for_string;
 
                     // mark string as read to wait for a new one
-                    listener.read_nmea_string();
+                    listener.mark_as_read();
 
                     break;
                 }
@@ -94,7 +94,7 @@ namespace r2d2::location {
                 state = wait_for_string;
 
                 // mark string as read to wait for a new one
-                listener.read_nmea_string();                
+                listener.mark_as_read();                
 
                 return gga;
             }

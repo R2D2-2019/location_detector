@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace r2d2::string {
+namespace r2d2::location {
     /**
      * @brief Get the offset of the separator
      * returns 0 if no seperator is found
