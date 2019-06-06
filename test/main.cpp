@@ -186,7 +186,7 @@ TEST_CASE("process function in module", "[module]") {
 
     // add a string to the recieve buffer
     // https://www.gpsinformation.org/dale/nmea.htm#GGA
-    usart.set_receive_string("$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47\n");
+    usart.set_receive_string("$GPGGA,123519,4807.038,N,01131.002,E,1,08,0.9,545.4,M,46.9,M,,*47\n");
 
     REQUIRE(usart.available() > 10);
 
@@ -194,13 +194,14 @@ TEST_CASE("process function in module", "[module]") {
     REQUIRE(comm_data.type == frame_type::COORDINATE);
     auto gga = comm_data.as_frame_type<frame_type::COORDINATE>();
 
-    REQUIRE(gga.altitude == 0);
-    REQUIRE(gga.long_tenthousandth_min == 0);    
-    REQUIRE(gga.lat_tenthousandth_min == 0);
-    REQUIRE(gga.lat_deg == 0);
-    REQUIRE(gga.lat_min == 0);
-    REQUIRE(gga.long_deg == 0);
-    REQUIRE(gga.long_min == 0);
+
+    REQUIRE(gga.altitude == 545);
+    REQUIRE(gga.long_tenthousandth_min == 20);    
+    REQUIRE(gga.lat_tenthousandth_min == 380);
+    REQUIRE(gga.lat_deg == 48);
+    REQUIRE(gga.lat_min == 7);
+    REQUIRE(gga.long_deg == 11);
+    REQUIRE(gga.long_min == 31);
     REQUIRE(gga.north_south_hemisphere == true);
     REQUIRE(gga.east_west_hemisphere == true);
 }
