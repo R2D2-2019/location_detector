@@ -193,16 +193,6 @@ TEST_CASE("process function in module", "[module]") {
     auto comm_data = comm.get_data();
     REQUIRE(comm_data.type == frame_type::COORDINATE);
     auto gga = comm_data.as_frame_type<frame_type::COORDINATE>();
-    /*REQUIRE(comm_gga.time == 123519);
-    REQUIRE(comm_gga.latitude == 4807.038f);
-    REQUIRE(comm_gga.longitude == 01131.000f);
-    REQUIRE(comm_gga.fix_quality == 1);
-    REQUIRE(comm_gga.satellites_tracked == 8);
-    REQUIRE(comm_gga.horizontal_dilution == 0.9f);
-    REQUIRE(comm_gga.altitude == 545);
-    REQUIRE(comm_gga.altitude_measurement == 'M');
-    REQUIRE(comm_gga.geoid_height == 46.9f);
-    REQUIRE(comm_gga.geoid_height_measurement == 'M');*/
 
     REQUIRE(gga.altitude == 0);
     REQUIRE(gga.long_tenthousandth_min == 0);    
