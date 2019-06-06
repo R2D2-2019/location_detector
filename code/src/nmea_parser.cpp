@@ -4,7 +4,7 @@
 namespace r2d2::location {
     gga_s nmea_parser_c::parse_nmea(const uint8_t *gps_message,
                                     const size_t length) {
-        gga_s location;
+        gga_s location{};
         GGA GGAindex = GGA::sentence;
 
         for (size_t i = 0; i < length; i++) {
