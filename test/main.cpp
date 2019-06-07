@@ -181,19 +181,17 @@ TEST_CASE("process function in module", "[module]") {
     r2d2::mock_comm_c comm;
     r2d2::location::module_c module(comm, nmea);
 
-    const auto frame = comm.create_frame<r2d2::frame_type::COORDINATE>({true});
-    comm.accept_frame(frame);
+    //add frame to activate the module
 
     // add a string to the recieve buffer
     // https://www.gpsinformation.org/dale/nmea.htm#GGA
     usart.set_receive_string("$GPGGA,123519,4807.038,N,01131.002,E,1,08,0.9,545.4,M,46.9,M,,*47\n");
-
-    REQUIRE(usart.available() > 10);
+    comm.request(frame_type::COORDINATE);
+    module.process();
 
     auto comm_data = comm.get_data();
     REQUIRE(comm_data.type == frame_type::COORDINATE);
     auto gga = comm_data.as_frame_type<frame_type::COORDINATE>();
-
 
     REQUIRE(gga.altitude == 545);
     REQUIRE(gga.long_tenthousandth_min == 20);    
