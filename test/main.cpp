@@ -175,31 +175,26 @@ TEST_CASE("nmea parser with inclomplete string", "[nmea_parser]") {
 }
 
 TEST_CASE("process function in module", "[module]") {
-    // create a test usart object
     auto usart = usart::test_usart_c();
-    r2d2::location::uart_nmea_c nmea(usart);
-    r2d2::mock_comm_c comm;
-    r2d2::location::module_c module(comm, nmea);
-
-    //add frame to activate the module
+    location::uart_nmea_c nmea(usart);
+    mock_comm_c comm;
+    // create a test module with all required parameters
+    location::module_c module(comm, nmea);
 
     // add a string to the recieve buffer
     // https://www.gpsinformation.org/dale/nmea.htm#GGA
     usart.set_receive_string("$GPGGA,123519,4807.038,N,01131.002,E,1,08,0.9,545.4,M,46.9,M,,*47\n");
-    comm.request(frame_type::COORDINATE);
+
+    // create request frame
+    auto frame = comm.create_frame<frame_type::COORDINATE>({});
+    frame.request = true;
+    comm.accept_frame(frame);
+
     module.process();
 
+    //check if module created a frame
+    REQUIRE(comm.has_data() == true);
     auto comm_data = comm.get_data();
     REQUIRE(comm_data.type == frame_type::COORDINATE);
-    auto gga = comm_data.as_frame_type<frame_type::COORDINATE>();
-
-    REQUIRE(gga.altitude == 545);
-    REQUIRE(gga.long_tenthousandth_min == 20);    
-    REQUIRE(gga.lat_tenthousandth_min == 380);
-    REQUIRE(gga.lat_deg == 48);
-    REQUIRE(gga.lat_min == 7);
-    REQUIRE(gga.long_deg == 11);
-    REQUIRE(gga.long_min == 31);
-    REQUIRE(gga.north_south_hemisphere == true);
-    REQUIRE(gga.east_west_hemisphere == true);
+    REQUIRE(comm_data.request == false);
 }
