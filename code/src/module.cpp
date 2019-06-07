@@ -33,7 +33,7 @@ namespace r2d2::location {
 
             // send the frame on the bus
             comm.send(frame);
-            
+
             request_triggered = false;
         }
     }
