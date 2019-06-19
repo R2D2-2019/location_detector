@@ -175,9 +175,19 @@ TEST_CASE("nmea parser with inclomplete string", "[nmea_parser]") {
 }
 
 TEST_CASE("process function in module", "[module]") {
+    // create a test usart object
     auto usart = usart::test_usart_c();
+
+    // create a nmea object
     location::uart_nmea_c nmea(usart);
+
     mock_comm_c comm;
+
+    // accept all frames 
+    comm.listen_for_frames({frame_type::ALL});
+
+    REQUIRE(comm.accepts_frame(frame_type::COORDINATE));
+
     // create a test module with all required parameters
     location::module_c module(comm, nmea);
 
@@ -188,13 +198,17 @@ TEST_CASE("process function in module", "[module]") {
     // create request frame
     auto frame = comm.create_frame<frame_type::COORDINATE>({});
     frame.request = true;
+    
     comm.accept_frame(frame);
 
+    // get the location
     module.process();
 
     //check if module created a frame
-    REQUIRE(comm.has_data() == true);
-    auto comm_data = comm.get_data();
+    REQUIRE(comm.get_send_frames().size() == 1);
+
+    // get the first item in the vector
+    auto comm_data = (*comm.get_send_frames().begin());
     REQUIRE(comm_data.type == frame_type::COORDINATE);
     REQUIRE(comm_data.request == false);
 }
