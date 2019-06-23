@@ -13,14 +13,14 @@ namespace r2d2::location {
             degrees_minutes = atoi(data, comma_offset);
 
             // get the data after the comma
-            ret.tenthousends = atoi(data + comma_offset, length - comma_offset);
+            ret.tenthousandths = atoi(data + comma_offset, length - comma_offset);
 
-            // check if the length of the string is in the tenthousends
+            // check if the length of the string is in the tenthousandths
             uint16_t after_comma = length - comma_offset;
 
             if (after_comma < 5) {
                 // multiply so the value is in the correct place
-                ret.tenthousends *= pow(10, 5 - after_comma);
+                ret.tenthousandths *= pow(10, 5 - after_comma);
             }
             
         } else {
@@ -76,7 +76,7 @@ namespace r2d2::location {
                 break;
             }
             case GGA::fix_quality: {
-                location.fix_quality = atoi(gps_message + i, sep_offset);
+                location.fix = static_cast<fix_status>(atoi(gps_message + i, sep_offset));
                 break;
             }
             case GGA::satellites_tracked: {
@@ -106,7 +106,7 @@ namespace r2d2::location {
             case GGA::diff_age: {
                 // this parameters is not transmitted if we dont have a dgps fix
                 // or higher.
-                if (location.fix_quality <= 1) {
+                if (static_cast<uint8_t>(location.fix) <= 1) {
                     break;
                 }
 
@@ -116,7 +116,7 @@ namespace r2d2::location {
             case GGA::diff_id: {
                 // this parameters is not transmitted if we dont have a dgps fix
                 // or higher.
-                if (location.fix_quality <= 1) {
+                if (static_cast<uint8_t>(location.fix) <= 1) {
                     break;
                 }
 

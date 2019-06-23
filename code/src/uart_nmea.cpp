@@ -19,12 +19,12 @@ namespace r2d2::location {
 
         frame.long_deg = longitude.degrees;
         frame.long_min = longitude.minutes;
-        frame.long_tenthousandth_min = longitude.tenthousends;
+        frame.long_tenthousandth_min = longitude.tenthousandths;
         frame.east_west_hemisphere = east;
 
         frame.lat_deg = latitude.degrees;
         frame.lat_min = latitude.minutes;
-        frame.lat_tenthousandth_min = latitude.tenthousends;
+        frame.lat_tenthousandth_min = latitude.tenthousandths;
         frame.north_south_hemisphere = north;
 
         return frame;

@@ -22,9 +22,9 @@ namespace r2d2::location {
         auto gga = nmea.get_location();
 
         // send data if we have a request
-        if (request_triggered) {
+        if (request_triggered || true) {
             // check if we have a valid location
-            if (gga.fix_quality == 0) {
+            if (gga.fix == fix_status::invalid) {
                 // gps signal is invalid. So we don't have data yet or we dont
                 // have a fix.
                 return;

@@ -4,14 +4,39 @@
 
 namespace r2d2::location {
     /**
-     * @brief Struct containing the degrees, minutes, tenthousends minute for
+     * @brief Struct containing the degrees, minutes, tenthousandths minute for
      * latitude/longitude.
      *
      */
     struct degrees {
-        uint16_t tenthousends;
+        uint16_t tenthousandths;
         uint8_t minutes;
         uint8_t degrees;
+    };
+
+    /**
+     * @brief Enum class for the fix status
+     * 0 = invalid
+     * 1 = GPS fix (SPS)
+     * 2 = DGPS fix, OmniSTAR VBS
+     * 3 = PPS fix
+     * 4 = Real Time Kinematic, fixed integers
+     * 5 = Float RTK, float integers, OmniSTAR XP/HP or Location RTK
+     * 6 = estimated (dead reckoning) (2.3 feature)
+     * 7 = Manual input mode
+     * 8 = Simulation mode
+     */
+    enum class fix_status : uint8_t {
+        invalid = 0,
+        gps = 1,
+        dgps = 2,
+        pps = 3,
+        rtk = 4,
+        rtk_float = 5,
+        dead_reckoning = 6,
+        manual = 7,
+        simulation = 8,
+        unsupported
     };
 
     /**
@@ -50,16 +75,7 @@ namespace r2d2::location {
         uint16_t diff_id;
 
         // variable for how reliable the data is.
-        // 0 = invalid
-        // 1 = GPS fix (SPS)
-        // 2 = DGPS fix, OmniSTAR VBS
-        // 3 = PPS fix
-        // 4 = Real Time Kinematic, fixed integers
-        // 5 = Float RTK, float integers, OmniSTAR XP/HP or Location RTK
-        // 6 = estimated (dead reckoning) (2.3 feature)
-        // 7 = Manual input mode
-        // 8 = Simulation mode
-        uint8_t fix_quality;
+        fix_status fix;
 
         // variable that stores how much gps satellites we are tracking.
         uint8_t satellites_tracked;
@@ -82,7 +98,7 @@ namespace r2d2::location {
      * @return false
      */
     inline bool operator==(const degrees &lhs, const degrees &rhs) {
-        return lhs.tenthousends == rhs.tenthousends &&
+        return lhs.tenthousandths == rhs.tenthousandths &&
                lhs.minutes == rhs.minutes && lhs.degrees == rhs.degrees;
     }
 
@@ -94,7 +110,7 @@ namespace r2d2::location {
      * @return hwlib::ostream& 
      */
     inline hwlib::ostream &operator<<(hwlib::ostream &os, const degrees &other) {
-        os << '{' << other.tenthousends << ", " << int(other.minutes) << ", "
+        os << '{' << other.tenthousandths << ", " << int(other.minutes) << ", "
             << int(other.degrees) << '}';
         return os;
     }    
