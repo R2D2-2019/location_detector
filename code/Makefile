@@ -20,5 +20,6 @@ SEARCH  := ./headers ./src
 # set REATIVE to the next higher directory 
 # and defer to the Makefile.due there
 RELATIVE := $(RELATIVE)../
+RESULTS += main.lss
 include $(RELATIVE)Makefile.due
 

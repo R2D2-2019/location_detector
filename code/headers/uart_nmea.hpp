@@ -39,7 +39,7 @@ namespace r2d2::location {
         /// Function that returns the current location.
         /// \details
         /// when no new location is available this will return a gga_s struct
-        /// with a fix_quality on 0 for an invalid fix.
+        /// with a fix on 0 for an invalid fix.
         gga_s get_location();
 
         /// \brief
@@ -56,7 +56,8 @@ namespace r2d2::location {
          * \param south
          * \param altitude
          */
-        frame_coordinate_s coordinates_to_frame(float longitude, float latitude,
+        frame_coordinate_s coordinates_to_frame(decimal_degrees longitude,
+                                                decimal_degrees latitude,
                                                 bool north, bool east,
                                                 int16_t altitude);
     };
