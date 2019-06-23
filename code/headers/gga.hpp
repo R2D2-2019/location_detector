@@ -13,15 +13,15 @@ namespace r2d2::location {
     struct gga_s {
         uint32_t time;
         float latitude;
-        char north_south_hemisphere;
         float longitude;
-        char east_west_hemisphere;
-        uint8_t fix_quality;
-        uint8_t satellites_tracked;
         float horizontal_dilution;
         float altitude;
+        float geoid_height;        
+        uint8_t fix_quality;
+        uint8_t satellites_tracked;
+        char north_south_hemisphere;
+        char east_west_hemisphere;
         char altitude_measurement;
-        float geoid_height;
         char geoid_height_measurement;
     };
 
