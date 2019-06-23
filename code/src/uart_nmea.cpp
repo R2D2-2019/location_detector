@@ -33,11 +33,9 @@ namespace r2d2::location {
     }
 
     frame_coordinate_s uart_nmea_c::gga_to_frame(const gga_s &source) {
-        return coordinates_to_frame(
-            source.longitude, source.latitude,
-            (source.north_south_hemisphere == 'N'),
-            (source.east_west_hemisphere == 'E'),
-            source.altitude);
+        return coordinates_to_frame(source.longitude, source.latitude,
+                                    source.is_north_hemisphere,
+                                    source.is_east_hemisphere, source.altitude);
     }
 
     gga_s uart_nmea_c::get_location() {
@@ -94,7 +92,7 @@ namespace r2d2::location {
                 state = wait_for_string;
 
                 // mark string as read to wait for a new one
-                listener.mark_as_read();                
+                listener.mark_as_read();
 
                 return gga;
             }

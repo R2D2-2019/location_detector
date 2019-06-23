@@ -29,19 +29,19 @@ namespace r2d2::location {
                 break;
             }
             case GGA::latitude: {
-                location.latitude = atof(gps_message + i, sep_offset);
+                location.latitude = atoi(gps_message + i, sep_offset);
                 break;
             }
             case GGA::north_south_hemisphere: {
-                location.north_south_hemisphere = gps_message[i];
+                location.is_north_hemisphere = gps_message[i] == 'N';
                 break;
             }
             case GGA::longitude: {
-                location.longitude = atof(gps_message + i, sep_offset);
+                location.longitude = atoi(gps_message + i, sep_offset);
                 break;
             }
             case GGA::east_west_hemisphere: {
-                location.east_west_hemisphere = gps_message[i];
+                location.is_east_hemisphere = gps_message[i] == 'E';
                 break;
             }
             case GGA::fix_quality: {
@@ -61,7 +61,7 @@ namespace r2d2::location {
                 break;
             }
             case GGA::altitude_measurement: {
-                location.altitude_measurement = gps_message[i];
+                location.altitude_unit = gps_message[i];
                 break;
             }
             case GGA::geoid_height: {
@@ -69,7 +69,9 @@ namespace r2d2::location {
                 break;
             }
             case GGA::geoid_height_measurement: {
-                location.geoid_height_measurement = gps_message[i];
+                location.geoid_height_unit = gps_message[i];
+                break;
+            }
                 break;
             }
             default: { 
