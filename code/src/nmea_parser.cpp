@@ -104,8 +104,8 @@ namespace r2d2::location {
                 break;
             }
             case GGA::diff_age: {
-                // this parameters is not transmitted if we dont have a dgps fix
-                // or higher.
+                // this parameter is not transmitted if we dont have a dgps fix
+                // or higher (dgps == 2 so higher than or 2).
                 if (static_cast<uint8_t>(location.fix) <= 1) {
                     break;
                 }
@@ -114,8 +114,8 @@ namespace r2d2::location {
                 break;
             }
             case GGA::diff_id: {
-                // this parameters is not transmitted if we dont have a dgps fix
-                // or higher.
+                // this parameter is not transmitted if we dont have a dgps fix
+                // or higher (dgps == 2 so higher than or 2).
                 if (static_cast<uint8_t>(location.fix) <= 1) {
                     break;
                 }
