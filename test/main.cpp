@@ -102,17 +102,17 @@ TEST_CASE("usart nmea parser test", "[nmea_parser]") {
     auto gga = nmea.get_location();
 
     REQUIRE(gga.time == 123519);
-    REQUIRE(gga.latitude == 4807.038f);
-    REQUIRE(gga.north_south_hemisphere == 'N');
-    REQUIRE(gga.longitude == 01131.000f);
-    REQUIRE(gga.east_west_hemisphere == 'E');
+    REQUIRE(gga.latitude == location::degrees{380, 7, 48});
+    REQUIRE(gga.is_north_hemisphere == true);
+    REQUIRE(gga.longitude == location::degrees{0, 31, 11});
+    REQUIRE(gga.is_east_hemisphere == true);
     REQUIRE(gga.fix_quality == 1);
     REQUIRE(gga.satellites_tracked == 8);
     REQUIRE(gga.horizontal_dilution == 0.9f);
     REQUIRE(gga.altitude == 545.4f);
-    REQUIRE(gga.altitude_measurement == 'M');
+    REQUIRE(gga.altitude_unit == 'M');
     REQUIRE(gga.geoid_height == 46.9f);
-    REQUIRE(gga.geoid_height_measurement == 'M');
+    REQUIRE(gga.geoid_height_unit == 'M');
 }
 
 TEST_CASE("usart nmea parser convert frame test", "[nmea_parser]") {
