@@ -1,7 +1,6 @@
 #pragma once
 
 #include <hwlib.hpp>
-#include <ostream>
 
 namespace r2d2::location {
     /**
