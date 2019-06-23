@@ -8,8 +8,8 @@ namespace r2d2::location {
         : listener(usart_port) {
     }
 
-    frame_coordinate_s uart_nmea_c::coordinates_to_frame(degrees longitude,
-                                                         degrees latitude,
+    frame_coordinate_s uart_nmea_c::coordinates_to_frame(decimal_degrees longitude,
+                                                         decimal_degrees latitude,
                                                          bool north, bool east,
                                                          int16_t altitude) {
 

@@ -3,9 +3,9 @@
 #include <cmath>
 
 namespace r2d2::location {
-    degrees get_degrees(const uint8_t *data, size_t length) {
+    decimal_degrees get_degrees(const uint8_t *data, size_t length) {
         size_t comma_offset = get_offset_separator(data, length, '.');
-        degrees ret{};
+        decimal_degrees ret{};
         uint32_t degrees_minutes;
 
         if (comma_offset) {

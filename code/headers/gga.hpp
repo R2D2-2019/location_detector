@@ -8,7 +8,7 @@ namespace r2d2::location {
      * latitude/longitude.
      *
      */
-    struct degrees {
+    struct decimal_degrees {
         uint16_t tenthousandths;
         uint8_t minutes;
         uint8_t degrees;
@@ -51,8 +51,8 @@ namespace r2d2::location {
         uint32_t time;
 
         // Latitude/ longitude
-        degrees latitude;
-        degrees longitude;
+        decimal_degrees latitude;
+        decimal_degrees longitude;
 
         // Horizontal dilution of precision. The lower the number the better.
         // This number is lower if the satellites are more spread out.
@@ -97,7 +97,7 @@ namespace r2d2::location {
      * @return true
      * @return false
      */
-    inline bool operator==(const degrees &lhs, const degrees &rhs) {
+    inline bool operator==(const decimal_degrees &lhs, const decimal_degrees &rhs) {
         return lhs.tenthousandths == rhs.tenthousandths &&
                lhs.minutes == rhs.minutes && lhs.degrees == rhs.degrees;
     }
@@ -109,7 +109,7 @@ namespace r2d2::location {
      * @param other 
      * @return hwlib::ostream& 
      */
-    inline hwlib::ostream &operator<<(hwlib::ostream &os, const degrees &other) {
+    inline hwlib::ostream &operator<<(hwlib::ostream &os, const decimal_degrees &other) {
         os << '{' << other.tenthousandths << ", " << int(other.minutes) << ", "
             << int(other.degrees) << '}';
         return os;

@@ -102,9 +102,9 @@ TEST_CASE("usart nmea parser test", "[nmea_parser]") {
     auto gga = nmea.get_location();
 
     REQUIRE(gga.time == 123519);
-    REQUIRE(gga.latitude == location::degrees{380, 7, 48});
+    REQUIRE(gga.latitude == location::decimal_degrees{380, 7, 48});
     REQUIRE(gga.is_north_hemisphere == true);
-    REQUIRE(gga.longitude == location::degrees{0, 31, 11});
+    REQUIRE(gga.longitude == location::decimal_degrees{0, 31, 11});
     REQUIRE(gga.is_east_hemisphere == true);
     REQUIRE(gga.fix == location::fix_status::gps);
     REQUIRE(gga.satellites_tracked == 8);
