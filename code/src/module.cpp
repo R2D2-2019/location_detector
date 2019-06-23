@@ -3,7 +3,6 @@
 namespace r2d2::location {
     void module_c::process() {
         // check for frame
-
         while (comm.has_data()) {
             auto frame = comm.get_data();
 
@@ -18,9 +17,12 @@ namespace r2d2::location {
             }
         }
 
-        if (request_triggered) {
-            auto gga = nmea.get_location();
+        // process any available data. This is done so we don't send any old
+        // location if we didn't get a request for a long time.
+        auto gga = nmea.get_location();
 
+        // send data if we have a request
+        if (request_triggered) {
             // check if we have a valid location
             if (gga.fix_quality == 0) {
                 // gps signal is invalid. So we don't have data yet or we dont
