@@ -106,7 +106,7 @@ TEST_CASE("usart nmea parser test", "[nmea_parser]") {
     REQUIRE(gga.is_north_hemisphere == true);
     REQUIRE(gga.longitude == location::degrees{0, 31, 11});
     REQUIRE(gga.is_east_hemisphere == true);
-    REQUIRE(gga.fix_quality == 1);
+    REQUIRE(gga.fix == location::fix_status::gps);
     REQUIRE(gga.satellites_tracked == 8);
     REQUIRE(gga.horizontal_dilution == 0.9f);
     REQUIRE(gga.altitude == 545.4f);
