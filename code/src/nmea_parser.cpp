@@ -72,6 +72,24 @@ namespace r2d2::location {
                 location.geoid_height_unit = gps_message[i];
                 break;
             }
+            case GGA::diff_age: {
+                // this parameters is not transmitted if we dont have a dgps fix
+                // or higher.
+                if (location.fix_quality <= 1) {
+                    break;
+                }
+
+                location.diff_age = atoi(gps_message + i, sep_offset);
+                break;
+            }
+            case GGA::diff_id: {
+                // this parameters is not transmitted if we dont have a dgps fix
+                // or higher.
+                if (location.fix_quality <= 1) {
+                    break;
+                }
+
+                location.diff_id = atoi(gps_message + i, sep_offset);
                 break;
             }
             default: { 

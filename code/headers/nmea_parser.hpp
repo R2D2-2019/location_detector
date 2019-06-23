@@ -19,7 +19,9 @@ namespace r2d2::location {
             altitude,
             altitude_measurement,
             geoid_height,
-            geoid_height_measurement
+            geoid_height_measurement,
+            diff_age,
+            diff_id
         };
 
     public:

@@ -31,6 +31,13 @@ namespace r2d2::location {
         // altitude using the WGS-84 ellipsoid
         float geoid_height;
 
+        // the age in seconds since the last update from the diff reference
+        // station.
+        uint32_t diff_age;
+
+        // the id of the diff reference station
+        uint16_t diff_id;
+
         // variable for how reliable the data is.
         // 0 = invalid
         // 1 = GPS fix (SPS)
