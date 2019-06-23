@@ -1,7 +1,38 @@
 #include <nmea_parser.hpp>
 #include <string.hpp>
+#include <cmath>
 
 namespace r2d2::location {
+    degrees get_degrees(const uint8_t *data, size_t length) {
+        size_t comma_offset = get_offset_separator(data, length, '.');
+        degrees ret{};
+        uint32_t degrees_minutes;
+
+        if (comma_offset) {
+            // get the data before the comma
+            degrees_minutes = atoi(data, comma_offset);
+
+            // get the data after the comma
+            ret.tenthousends = atoi(data + comma_offset, length - comma_offset);
+
+            // check if the length of the string is in the tenthousends
+            uint16_t after_comma = length - comma_offset;
+
+            if (after_comma < 5) {
+                // multiply so the value is in the correct place
+                ret.tenthousends *= pow(10, 5 - after_comma);
+            }
+            
+        } else {
+            degrees_minutes = atoi(data, length);
+        }
+
+        ret.degrees = degrees_minutes / 100;
+        ret.minutes = degrees_minutes - (ret.degrees * 100);
+
+        return ret; 
+    }
+
     gga_s nmea_parser_c::parse_nmea(const uint8_t *gps_message,
                                     const size_t length) {
         gga_s location{};
@@ -29,7 +60,7 @@ namespace r2d2::location {
                 break;
             }
             case GGA::latitude: {
-                location.latitude = atoi(gps_message + i, sep_offset);
+                location.latitude = get_degrees(gps_message + i, sep_offset);
                 break;
             }
             case GGA::north_south_hemisphere: {
@@ -37,7 +68,7 @@ namespace r2d2::location {
                 break;
             }
             case GGA::longitude: {
-                location.longitude = atoi(gps_message + i, sep_offset);
+                location.longitude = get_degrees(gps_message + i, sep_offset);
                 break;
             }
             case GGA::east_west_hemisphere: {

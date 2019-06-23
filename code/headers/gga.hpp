@@ -1,8 +1,20 @@
 #pragma once
 
 #include <hwlib.hpp>
+#include <ostream>
 
 namespace r2d2::location {
+    /**
+     * @brief Struct containing the degrees, minutes, tenthousends minute for
+     * latitude/longitude.
+     *
+     */
+    struct degrees {
+        uint16_t tenthousends;
+        uint8_t minutes;
+        uint8_t degrees;
+    };
+
     /**
      * @brief this struct contains essential fix data which provide 3D location
      * and accuracy data
@@ -15,8 +27,8 @@ namespace r2d2::location {
         uint32_t time;
 
         // Latitude/ longitude
-        uint32_t latitude;
-        uint32_t longitude;
+        degrees latitude;
+        degrees longitude;
 
         // Horizontal dilution of precision. The lower the number the better.
         // This number is lower if the satellites are more spread out.
@@ -61,5 +73,31 @@ namespace r2d2::location {
         char altitude_unit;
         char geoid_height_unit;
     };
+
+    /**
+     * @brief Operator for the tests using degrees
+     *
+     * @param lhs
+     * @param rhs
+     * @return true
+     * @return false
+     */
+    inline bool operator==(const degrees &lhs, const degrees &rhs) {
+        return lhs.tenthousends == rhs.tenthousends &&
+               lhs.minutes == rhs.minutes && lhs.degrees == rhs.degrees;
+    }
+
+    /**
+     * @brief Easy way to print the degrees struct
+     * 
+     * @param os 
+     * @param other 
+     * @return hwlib::ostream& 
+     */
+    inline hwlib::ostream &operator<<(hwlib::ostream &os, const degrees &other) {
+        os << '{' << other.tenthousends << ", " << int(other.minutes) << ", "
+            << int(other.degrees) << '}';
+        return os;
+    }    
 
 } // namespace r2d2::location

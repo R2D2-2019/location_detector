@@ -8,8 +8,8 @@ namespace r2d2::location {
         : listener(usart_port) {
     }
 
-    frame_coordinate_s uart_nmea_c::coordinates_to_frame(float longitude,
-                                                         float latitude,
+    frame_coordinate_s uart_nmea_c::coordinates_to_frame(degrees longitude,
+                                                         degrees latitude,
                                                          bool north, bool east,
                                                          int16_t altitude) {
 
@@ -17,16 +17,14 @@ namespace r2d2::location {
 
         frame.altitude = altitude;
 
-        frame.long_deg = static_cast<uint8_t>(longitude / 100);
-        frame.long_min = static_cast<uint8_t>(longitude - frame.long_deg * 100);
-        frame.long_tenthousandth_min = static_cast<uint16_t>(
-            (longitude - static_cast<int>(longitude)) * 10'000);
+        frame.long_deg = longitude.degrees;
+        frame.long_min = longitude.minutes;
+        frame.long_tenthousandth_min = longitude.tenthousends;
         frame.east_west_hemisphere = east;
 
-        frame.lat_deg = static_cast<uint8_t>(latitude / 100);
-        frame.lat_min = static_cast<uint8_t>(latitude - frame.lat_deg * 100);
-        frame.lat_tenthousandth_min = static_cast<uint16_t>(
-            (latitude - static_cast<int>(latitude)) * 10'000);
+        frame.lat_deg = latitude.degrees;
+        frame.lat_min = latitude.minutes;
+        frame.lat_tenthousandth_min = latitude.tenthousends;
         frame.north_south_hemisphere = north;
 
         return frame;

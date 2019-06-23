@@ -56,7 +56,7 @@ namespace r2d2::location {
          * \param south
          * \param altitude
          */
-        frame_coordinate_s coordinates_to_frame(float longitude, float latitude,
+        frame_coordinate_s coordinates_to_frame(degrees longitude, degrees latitude,
                                                 bool north, bool east,
                                                 int16_t altitude);
     };
