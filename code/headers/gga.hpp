@@ -9,7 +9,7 @@ namespace r2d2::location {
      *
      */
     struct decimal_degrees {
-        uint16_t tenthousandths;
+        uint32_t tenthousandths;
         uint8_t minutes;
         uint8_t degrees;
     };
