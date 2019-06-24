@@ -8,6 +8,7 @@ namespace r2d2::location {
      * latitude/longitude.
      *
      */
+    #pragma pack(4)
     struct decimal_degrees {
         uint32_t tenthousandths;
         uint8_t minutes;
