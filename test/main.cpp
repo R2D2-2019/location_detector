@@ -3,6 +3,8 @@
 #include <uart_nmea.hpp>
 #include <test_usart.hpp>
 #include <string.hpp>
+#include <module.hpp>
+#include <mock_bus.hpp>
 
 using namespace r2d2;
 
@@ -142,4 +144,71 @@ TEST_CASE("usart nmea parser convert frame test", "[nmea_parser]") {
     REQUIRE(frame.east_west_hemisphere == true);
 
     REQUIRE(frame.altitude == 545);
+}
+
+TEST_CASE("nmea parser with inclomplete string", "[nmea_parser]") {
+    // create a test usart object
+    auto usart = usart::test_usart_c();
+
+    // add a string to the recieve buffer
+    // https://www.gpsinformation.org/dale/nmea.htm#GGA
+    usart.set_receive_string("$GPGGA,123519,4807.038,N,01131.000,E,1,\n");
+
+    REQUIRE(usart.available() > 10);
+
+    auto nmea = location::uart_nmea_c(usart);
+
+    auto gga = nmea.get_location();
+
+    REQUIRE(gga.time == 123519);
+    REQUIRE(gga.latitude == 4807.038f);
+    REQUIRE(gga.north_south_hemisphere == 'N');
+    REQUIRE(gga.longitude == 01131.000f);
+    REQUIRE(gga.east_west_hemisphere == 'E');
+    REQUIRE(gga.fix_quality == 1);
+    REQUIRE(gga.satellites_tracked == 0);
+    REQUIRE(gga.horizontal_dilution == 0.0f);
+    REQUIRE(gga.altitude == 0.0f);
+    REQUIRE(gga.altitude_measurement == 0);
+    REQUIRE(gga.geoid_height == 0.0f);
+    REQUIRE(gga.geoid_height_measurement == 0);
+}
+
+TEST_CASE("process function in module", "[module]") {
+    // create a test usart object
+    auto usart = usart::test_usart_c();
+
+    // create a nmea object
+    location::uart_nmea_c nmea(usart);
+
+    mock_comm_c comm;
+
+    // accept all frames 
+    comm.listen_for_frames({frame_type::ALL});
+
+    REQUIRE(comm.accepts_frame(frame_type::COORDINATE));
+
+    // create a test module with all required parameters
+    location::module_c module(comm, nmea);
+
+    // add a string to the recieve buffer
+    // https://www.gpsinformation.org/dale/nmea.htm#GGA
+    usart.set_receive_string("$GPGGA,123519,4807.038,N,01131.002,E,1,08,0.9,545.4,M,46.9,M,,*47\n");
+
+    // create request frame
+    auto frame = comm.create_frame<frame_type::COORDINATE>({});
+    frame.request = true;
+    
+    comm.accept_frame(frame);
+
+    // get the location
+    module.process();
+
+    //check if module created a frame
+    REQUIRE(comm.get_send_frames().size() == 1);
+
+    // get the first item in the vector
+    auto comm_data = (*comm.get_send_frames().begin());
+    REQUIRE(comm_data.type == frame_type::COORDINATE);
+    REQUIRE(comm_data.request == false);
 }
