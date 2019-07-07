@@ -199,8 +199,10 @@ TEST_CASE("process function in module", "[module]") {
     
     comm.accept_frame(frame);
 
-    // get the location
+    // get the location    
     /*
+    //currently creates a segfault at comm.get_data()
+    //requires further investigation
     module.process();
 
     //check if module created a frame
