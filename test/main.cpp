@@ -161,17 +161,17 @@ TEST_CASE("nmea parser with inclomplete string", "[nmea_parser]") {
     auto gga = nmea.get_location();
 
     REQUIRE(gga.time == 123519);
-    REQUIRE(gga.latitude == 4807.038f);
-    REQUIRE(gga.north_south_hemisphere == 'N');
-    REQUIRE(gga.longitude == 01131.000f);
-    REQUIRE(gga.east_west_hemisphere == 'E');
-    REQUIRE(gga.fix_quality == 1);
+    REQUIRE(gga.latitude == location::decimal_degrees{380, 7, 48});
+    REQUIRE(gga.is_north_hemisphere == true);
+    REQUIRE(gga.longitude == location::decimal_degrees{0, 31, 11});
+    REQUIRE(gga.is_east_hemisphere == true);
+    REQUIRE(gga.fix == location::fix_status::gps);
     REQUIRE(gga.satellites_tracked == 0);
     REQUIRE(gga.horizontal_dilution == 0.0f);
     REQUIRE(gga.altitude == 0.0f);
-    REQUIRE(gga.altitude_measurement == 0);
+    REQUIRE(gga.altitude_unit == 0);
     REQUIRE(gga.geoid_height == 0.0f);
-    REQUIRE(gga.geoid_height_measurement == 0);
+    REQUIRE(gga.geoid_height_unit == 0);
 }
 
 TEST_CASE("process function in module", "[module]") {
